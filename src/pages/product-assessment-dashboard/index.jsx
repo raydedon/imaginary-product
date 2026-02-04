@@ -128,8 +128,8 @@ const ProductAssessmentDashboard = () => {
             totalProducts={products?.length}
           />
 
-          <div className="bg-card border border-border rounded-lg p-4 md:p-6">
-            <div className="flex items-center justify-between mb-4">
+          <div className="bg-card border border-border rounded-lg overflow-hidden sticky top-[92px] z-10">
+            <div className="flex items-center justify-between p-4 md:p-6 pb-3 border-b border-border bg-card">
               <h2 className="text-lg md:text-xl font-semibold text-foreground">
                 Product Catalog
               </h2>
@@ -139,10 +139,12 @@ const ProductAssessmentDashboard = () => {
             </div>
 
             {filteredProducts?.length > 0 ? (
-              <ProductGrid
-                products={filteredProducts}
-                onProductClick={handleProductClick}
-              />
+              <div className="p-4 md:p-6 pt-4">
+                <ProductGrid
+                  products={filteredProducts}
+                  onProductClick={handleProductClick}
+                />
+              </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-12 md:py-16">
                 <Icon name="PackageX" size={48} color="var(--color-muted)" />

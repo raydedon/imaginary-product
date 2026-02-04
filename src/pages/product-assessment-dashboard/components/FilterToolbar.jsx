@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Select from '../../../components/ui/Select';
 import Input from '../../../components/ui/Input';
 import Button from '../../../components/ui/Button';
@@ -9,15 +9,6 @@ const FilterToolbar = ({ onFilterChange, categories, totalProducts }) => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
-  const [isControlled, setIsControlled] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsControlled(false);
-    }, 5000);
-
-    return () => clearTimeout(timer);
-  }, []);
 
   useEffect(() => {
     const filters = {
@@ -36,10 +27,10 @@ const FilterToolbar = ({ onFilterChange, categories, totalProducts }) => {
     setMaxPrice('');
   };
 
-  const categoryOptions = [
+  const categoryOptions = useMemo(() => [
     { value: 'all', label: 'All Categories' },
     ...categories?.map(cat => ({ value: cat, label: cat?.charAt(0)?.toUpperCase() + cat?.slice(1) }))
-  ];
+  ], [categories]);
 
   return (
     <div className="bg-card border border-border rounded-lg p-4 md:p-6 mb-6">
@@ -59,7 +50,6 @@ const FilterToolbar = ({ onFilterChange, categories, totalProducts }) => {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="lg:col-span-2">
-          {isControlled ? (
             <Input
               type="search"
               label="Search Products"
@@ -67,14 +57,6 @@ const FilterToolbar = ({ onFilterChange, categories, totalProducts }) => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e?.target?.value)}
             />
-          ) : (
-            <Input
-              type="search"
-              label="Search Products"
-              placeholder="Search by name..."
-              defaultValue={searchTerm}
-            />
-          )}
         </div>
 
         <Select
