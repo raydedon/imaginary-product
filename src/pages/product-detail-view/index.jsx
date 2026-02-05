@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 import Header from '../../components/ui/Header';
@@ -12,6 +12,7 @@ import ProductSpecifications from './components/ProductSpecifications';
 import RelatedProducts from './components/RelatedProducts';
 import CustomerReviews from './components/CustomerReviews';
 import Icon from '../../components/AppIcon';
+import { useCart } from '../../hooks/useCart';
 
 
 const ProductDetailView = () => {
@@ -20,6 +21,7 @@ const ProductDetailView = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
+  const { addToCart } = useCart();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -107,11 +109,10 @@ const ProductDetailView = () => {
     loadProduct();
   }, [location?.search]);
 
-  const handleAddToCart = (configuredProduct) => {
-    console.log('Adding to cart:', configuredProduct);
-    // Simulate cart addition
-    alert(`Added ${configuredProduct?.quantity}x ${configuredProduct?.name} to cart`);
-  };
+  const handleAddToCart = useCallback((configuredProduct) => {
+    addToCart(configuredProduct);
+    navigate('/shopping-cart-management');
+  }, [addToCart, navigate]);
 
   const tabs = [
   { id: 'overview', label: 'Overview', icon: 'Info' },

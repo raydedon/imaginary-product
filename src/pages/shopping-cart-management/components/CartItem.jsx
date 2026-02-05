@@ -32,8 +32,8 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
     <div className="flex flex-col md:flex-row gap-4 md:gap-6 p-4 md:p-6 bg-card border border-border rounded-lg hover:shadow-md transition-shadow duration-250">
       <div className="w-full md:w-32 lg:w-40 h-32 md:h-32 lg:h-40 flex-shrink-0 overflow-hidden rounded-md bg-muted">
         <Image
-          src={item?.image}
-          alt={item?.imageAlt}
+          src={item?.images[0]?.url}
+          alt={item?.images[0]?.alt}
           className="w-full h-full object-cover"
         />
       </div>

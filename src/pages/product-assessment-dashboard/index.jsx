@@ -123,7 +123,7 @@ const ProductAssessmentDashboard = () => {
           </div>
 
           <FilterToolbar
-            onFilterChange={handleFilterChange}
+            onFilterChange={setFilters}
             categories={categories}
             totalProducts={products?.length}
           />
