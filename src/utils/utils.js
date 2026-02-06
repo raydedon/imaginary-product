@@ -40,11 +40,40 @@
         }
     };
 
+    const formatProducts = (products, limit) => {
+        let formattedProducts = products?.map((product) => ({
+            ...product,
+            image: product.images[0]
+          })) || [];
+        // If we have fewer products than requested, repeat the response and increment IDs to reach productCount
+        if (formattedProducts.length < limit) {
+          const missingCount = limit - formattedProducts.length;
+          const repeatedProducts = [];
+          const originalLength = formattedProducts.length;
+
+          for (let i = 0; i < missingCount; i++) {
+            // Clone the product, assign a new incremented id
+            const originalProduct = formattedProducts[i % originalLength];
+            const incrementedProduct = {
+              ...originalProduct,
+              id: originalProduct.id + originalLength * Math.floor(i / originalLength) + (i % originalLength) + 1
+            };
+            repeatedProducts.push(incrementedProduct);
+          }
+
+          formattedProducts = [...formattedProducts, ...repeatedProducts];
+          // Make sure it's exactly productCount
+          formattedProducts = formattedProducts.slice(0, limit);
+        }
+        return formattedProducts;
+    };
+
     export const fetchProducts = async (limit = 50) => {
         try {
             const response = await fetch(`https://dummyjson.com/products?limit=${limit}`);
             const data = await response.json();
-            return data?.products || [];
+
+            return formatProducts(data?.products, limit);
         } catch (error) {
             console.error('Failed to fetch products:', error);
             return [];
@@ -57,16 +86,16 @@
      * @param {number} limit - How many products to fetch (optional, default: 12).
      * @returns {Promise<Array>} Array of product objects in the given category.
      */
-    export const fetchProductsByCategory = async (category, limit = 12) => {
+    export const fetchProductsByCategory = async (category, limit = 4) => {
         if (!category) {
             console.error('fetchProductsByCategory: category argument is required');
             return [];
         }
         try {
-            const response = await fetch(`https://dummyjson.com/products/category/${encodeURIComponent(category)}?limit=${limit}`);
+            const response = await fetch(`https://dummyjson.com/products/category/${category}?limit=${limit}`);
             const data = await response.json();
             // The API returns products in data.products just like the main endpoint
-            return data?.products || [];
+            return formatProducts(data?.products, limit);
         } catch (error) {
             console.error('Failed to fetch products by category:', error);
             return [];

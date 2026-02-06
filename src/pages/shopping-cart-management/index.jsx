@@ -17,21 +17,17 @@ import APIUsecaseDemo from './components/APIUsecaseDemo';
 import { useCart } from '../../hooks/useCart';
 
 const ShoppingCartManagement = () => {
-  const { cartItems, isLoading, calculateSubtotal, calculateTax, calculateShipping, calculateDiscount, calculateTotal, handleUpdateQuantity, handleRemoveItem, handleApplyCoupon, setIsCheckoutOpen, couponCode, isCheckoutOpen, getGrandTotal, setCouponCode } = useCart();
-
-  if (isLoading) return <div>Loading...</div>;
-
+  const { cartItems, isLoading, calculateSubtotal, calculateTax, calculateShipping, calculateDiscount, calculateTotal, handleUpdateQuantity, handleRemoveItem, handleApplyCoupon, setIsCheckoutOpen, couponCode, isCheckoutOpen, getGrandTotal, setCouponCode, clearCart } = useCart();
 
   return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <PerformanceMonitor />
-        <AssessmentProgressIndicator />
-        <ErrorBoundaryStatusIndicator hasActiveErrors={true} />
-
-        <main className="pt-[76px] px-4 md:px-6 lg:px-8 pb-8 md:pb-12">
-          <div className="max-w-7xl mx-auto">
-            <div className="mb-6 md:mb-8">
+    <div className="min-h-screen bg-background">
+      <Header />
+      <PerformanceMonitor />
+      <AssessmentProgressIndicator />
+      <ErrorBoundaryStatusIndicator hasActiveErrors={true} />
+      <main className="pt-[76px] px-4 md:px-6 lg:px-8 pb-8 md:pb-12">
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-6 md:mb-8">
               <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-2 md:mb-3">
                 Shopping Cart
               </h1>

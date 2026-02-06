@@ -18,7 +18,7 @@ const EmptyCart = () => {
         Looks like you haven't added any items to your cart yet. Start shopping to find amazing products!
       </p>
 
-      <Link to="/product-detail-view">
+      <Link to="/product-assessment-dashboard">
         <Button
           variant="default"
           size="lg"

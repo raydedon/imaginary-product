@@ -5,7 +5,7 @@ import PerformanceMonitor from '../../components/ui/PerformanceMonitor';
 import FilterToolbar from './components/FilterToolbar';
 import ProductGrid from './components/ProductGrid';
 import Icon from '../../components/AppIcon';
-import axios from 'axios';
+import { fetchProducts, fetchCategories } from '../../utils/utils';
 
 const ProductAssessmentDashboard = () => {
   const navigate = useNavigate();
@@ -20,50 +20,19 @@ const ProductAssessmentDashboard = () => {
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-
-    const fetchCategories = async () => {
-      const categories = await fetchCategories();
-      setCategories(categories);
+    const fetchCategoriesData = async () => {
+      const fetchedCategories = await fetchCategories();
+      setCategories(fetchedCategories);
     };
-    fetchCategories();
+    fetchCategoriesData();
   }, []);
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await fetch(`https://dummyjson.com/products?limit=${productCount}`);
-        const data = await response.json();
-        let products = data?.products?.map((product) => ({
-            ...product,
-            image: product.images[0]
-          })) || [];
-        // If we have fewer products than requested, repeat the response and increment IDs to reach productCount
-        if (products.length < productCount) {
-          const missingCount = productCount - products.length;
-          const repeatedProducts = [];
-          const originalLength = products.length;
-
-          for (let i = 0; i < missingCount; i++) {
-            // Clone the product, assign a new incremented id
-            const originalProduct = products[i % originalLength];
-            const incrementedProduct = {
-              ...originalProduct,
-              id: originalProduct.id + originalLength * Math.floor(i / originalLength) + (i % originalLength) + 1
-            };
-            repeatedProducts.push(incrementedProduct);
-          }
-
-          products = [...products, ...repeatedProducts];
-          // Make sure it's exactly productCount
-          products = products.slice(0, productCount);
-        }
-        setProducts(products);
-      } catch (error) {
-        console.error('Error fetching products:', error);
-        setProducts([]);
-      }
+    const fetchProductsData = async () => {
+      const fetchedProducts = await fetchProducts(productCount);
+      setProducts(fetchedProducts);
     };
-    fetchProducts();
+    fetchProductsData();
   }, [productCount]);
 
   const filteredProducts = useMemo(() => {
