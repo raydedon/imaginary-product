@@ -5,6 +5,7 @@ import PerformanceMonitor from '../../components/ui/PerformanceMonitor';
 import FilterToolbar from './components/FilterToolbar';
 import ProductGrid from './components/ProductGrid';
 import Icon from '../../components/AppIcon';
+import axios from 'axios';
 
 const ProductAssessmentDashboard = () => {
   const navigate = useNavigate();
@@ -15,45 +16,59 @@ const ProductAssessmentDashboard = () => {
     maxPrice: null
   });
   const [productCount, setProductCount] = useState(50);
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
 
-  const categories = ['electronics', 'clothing', 'home', 'sports', 'books', 'toys', 'beauty', 'automotive'];
+  useEffect(() => {
 
-  const products = useMemo(() => {
-    return Array.from({ length: productCount }, (_, index) => {
-      const names = [
-        "Premium Wireless Bluetooth Headphones",
-        "Ultra HD 4K Smart Television",
-        "Professional DSLR Camera Kit",
-        "Ergonomic Office Chair",
-        "Stainless Steel Coffee Maker",
-        "Portable Power Bank 20000mAh",
-        "Gaming Mechanical Keyboard",
-        "Fitness Tracker Smart Watch",
-        "Memory Foam Mattress Queen",
-        "Electric Standing Desk"
-      ];
+    const fetchCategories = async () => {
+      const categories = await fetchCategories();
+      setCategories(categories);
+    };
+    fetchCategories();
+  }, []);
 
-      const category = categories?.[index % categories?.length];
-      const name = names?.[index % names?.length];
-      const price = parseFloat((Math.random() * 500 + 10)?.toFixed(2));
-      const rating = parseFloat((Math.random() * 2 + 3)?.toFixed(1));
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch(`https://dummyjson.com/products?limit=${productCount}`);
+        const data = await response.json();
+        let products = data?.products?.map((product) => ({
+            ...product,
+            image: product.images[0]
+          })) || [];
+        // If we have fewer products than requested, repeat the response and increment IDs to reach productCount
+        if (products.length < productCount) {
+          const missingCount = productCount - products.length;
+          const repeatedProducts = [];
+          const originalLength = products.length;
 
-      return {
-        id: `product-${index + 1}`,
-        name: `${name} - Model ${index + 1}`,
-        price,
-        category,
-        rating,
-        isNew: index % 50 === 0,
-        image: `https://picsum.photos/seed/${index}/400/600`,
-        imageAlt: `Professional product photography of ${name} in ${category} category with modern studio lighting and clean white background`
-      };
-    });
+          for (let i = 0; i < missingCount; i++) {
+            // Clone the product, assign a new incremented id
+            const originalProduct = products[i % originalLength];
+            const incrementedProduct = {
+              ...originalProduct,
+              id: originalProduct.id + originalLength * Math.floor(i / originalLength) + (i % originalLength) + 1
+            };
+            repeatedProducts.push(incrementedProduct);
+          }
+
+          products = [...products, ...repeatedProducts];
+          // Make sure it's exactly productCount
+          products = products.slice(0, productCount);
+        }
+        setProducts(products);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+        setProducts([]);
+      }
+    };
+    fetchProducts();
   }, [productCount]);
 
   const filteredProducts = useMemo(() => {
     return products?.filter(product => {
-      const matchesSearch = product?.name?.toLowerCase()?.includes(filters?.search?.toLowerCase());
+      const matchesSearch = product?.title?.toLowerCase()?.includes(filters?.search?.toLowerCase());
       const matchesCategory = filters?.category === 'all' || product?.category === filters?.category;
       const matchesMinPrice = filters?.minPrice === null || product?.price >= filters?.minPrice;
       const matchesMaxPrice = filters?.maxPrice === null || product?.price <= filters?.maxPrice;

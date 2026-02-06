@@ -29,7 +29,7 @@ const FilterToolbar = ({ onFilterChange, categories, totalProducts }) => {
 
   const categoryOptions = useMemo(() => [
     { value: 'all', label: 'All Categories' },
-    ...categories?.map(cat => ({ value: cat, label: cat?.charAt(0)?.toUpperCase() + cat?.slice(1) }))
+    ...categories?.map(cat => ({ value: cat.slug, label: cat?.name }))
   ], [categories]);
 
   return (

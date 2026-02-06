@@ -22,7 +22,7 @@ const ProductCard = ({ product, onClick }) => {
       </div>
       <div className="p-3 md:p-4">
         <h3 className="text-sm md:text-base font-semibold text-foreground line-clamp-2 mb-2">
-          {product?.name}
+          {product?.name ?? product?.title}
         </h3>
 
         <div className="flex items-center gap-1 mb-2">
@@ -44,7 +44,7 @@ const ProductCard = ({ product, onClick }) => {
             ${product?.price?.toFixed(2)}
           </span>
           <span className="text-xs text-muted-foreground capitalize">
-            {product?.category}
+            {product?.category?.name ?? product?.category}
           </span>
         </div>
       </div>

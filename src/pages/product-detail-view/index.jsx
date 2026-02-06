@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
 
 import Header from '../../components/ui/Header';
 import PerformanceMonitor from '../../components/ui/PerformanceMonitor';
@@ -13,16 +14,19 @@ import RelatedProducts from './components/RelatedProducts';
 import CustomerReviews from './components/CustomerReviews';
 import Icon from '../../components/AppIcon';
 import { useCart } from '../../hooks/useCart';
+import { fetchPexelsImages } from '../../utils/utils';
 
 
 const ProductDetailView = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const initialProduct = location?.state?.product;
+  const [product, setProduct] = useState(initialProduct);
+  const [loading, setLoading] = useState(!initialProduct);
   const [activeTab, setActiveTab] = useState('overview');
   const { addToCart } = useCart();
 
+  console.log(`product: ${JSON.stringify(product, null, 2)}`);
   useEffect(() => {
     const handleScroll = () => {
       console.log('Scroll position:', window.scrollY);
@@ -32,9 +36,11 @@ const ProductDetailView = () => {
   }, []);
 
   useEffect(() => {
-    const loadProduct = () => {
+    const loadProduct = async () => {
       try {
-        // Simulate product data loading
+        setLoading(true);
+
+        // Mock product data
         const mockProduct = {
           id: 1,
           name: "Premium Wireless Earbuds Pro",
@@ -48,39 +54,39 @@ const ProductDetailView = () => {
           stockCount: 47,
           category: "Electronics",
           images: [
-          {
-            url: "https://images.unsplash.com/photo-1722040456443-c644d014d43f",
-            alt: "Premium white wireless earbuds in charging case with LED indicators on marble surface showing sleek modern design"
-          },
-          {
-            url: "https://img.rocket.new/generatedImages/rocket_gen_img_1a5ccd24c-1767224182191.png",
-            alt: "Close-up of wireless earbud showing touch control surface and ergonomic shape with premium matte finish"
-          },
-          {
-            url: "https://images.unsplash.com/photo-1730848750011-4f1df6493f36",
-            alt: "Wireless earbuds with charging case open displaying both earbuds and USB-C charging port"
-          },
-          {
-            url: "https://img.rocket.new/generatedImages/rocket_gen_img_103e88a6c-1767281829508.png",
-            alt: "Person wearing wireless earbuds during outdoor workout showing secure fit and water-resistant design"
-          },
-          {
-            url: "https://images.unsplash.com/photo-1565267319814-d7591ba84ad9",
-            alt: "Wireless earbuds packaging and accessories including charging cable and multiple ear tip sizes"
-          }],
-
+            {
+              url: "https://images.unsplash.com/photo-1722040456443-c644d014d43f",
+              alt: "Premium white wireless earbuds in charging case with LED indicators on marble surface showing sleek modern design"
+            },
+            {
+              url: "https://img.rocket.new/generatedImages/rocket_gen_img_1a5ccd24c-1767224182191.png",
+              alt: "Close-up of wireless earbud showing touch control surface and ergonomic shape with premium matte finish"
+            },
+            {
+              url: "https://images.unsplash.com/photo-1730848750011-4f1df6493f36",
+              alt: "Wireless earbuds with charging case open displaying both earbuds and USB-C charging port"
+            },
+            {
+              url: "https://img.rocket.new/generatedImages/rocket_gen_img_103e88a6c-1767281829508.png",
+              alt: "Person wearing wireless earbuds during outdoor workout showing secure fit and water-resistant design"
+            },
+            {
+              url: "https://images.unsplash.com/photo-1565267319814-d7591ba84ad9",
+              alt: "Wireless earbuds packaging and accessories including charging cable and multiple ear tip sizes"
+            }
+          ],
           colors: ["Midnight Black", "Pearl White", "Ocean Blue", "Rose Gold"],
           sizes: ["Standard", "Small", "Large"],
           features: [
-          "Active Noise Cancellation (ANC) with transparency mode",
-          "8 hours playback + 24 hours with charging case",
-          "IPX7 water and sweat resistance rating",
-          "Bluetooth 5.3 with multipoint connectivity",
-          "Touch controls for calls, music, and voice assistant",
-          "Fast charging: 15 minutes = 2 hours playback",
-          "Premium audio drivers with deep bass response",
-          "Ergonomic design with 3 ear tip sizes included"],
-
+            "Active Noise Cancellation (ANC) with transparency mode",
+            "8 hours playback + 24 hours with charging case",
+            "IPX7 water and sweat resistance rating",
+            "Bluetooth 5.3 with multipoint connectivity",
+            "Touch controls for calls, music, and voice assistant",
+            "Fast charging: 15 minutes = 2 hours playback",
+            "Premium audio drivers with deep bass response",
+            "Ergonomic design with 3 ear tip sizes included"
+          ],
           specifications: {
             "Driver Size": "10mm dynamic drivers",
             "Frequency Response": "20Hz - 20kHz",
@@ -97,17 +103,33 @@ const ProductDetailView = () => {
           }
         };
 
-        setTimeout(() => {
-          setProduct(mockProduct);
-          setLoading(false);
-        }, 100);
+        console.log("Product Title:", product.title || product.name);
+
+        // Fetch images from Pexels based on product name/category
+        const pexelsImages = await fetchPexelsImages(product?.title ?? product?.name, 5);
+
+        // Merge Pexels images with mock product
+        const productWithImages = {
+          ...mockProduct,
+          ...product,
+          images: pexelsImages.length > 0 
+            ? pexelsImages // Use Pexels images if available
+            : mockProduct.images, // Fall back to mock images if Pexels fails
+          imageSource: pexelsImages.length > 0 ? 'pexels' : 'default'
+        };
+        productWithImages.images[0] = {...productWithImages.images[0], url: product?.image};
+
+        setProduct(productWithImages);
+        setLoading(false);
       } catch (error) {
+        console.error('Error loading product:', error);
+        setLoading(false);
         throw new Error('ERR_PROD_LOAD_FAIL');
       }
     };
 
     loadProduct();
-  }, [location?.search]);
+  }, [location?.search, product?.name]);
 
   const handleAddToCart = useCallback((configuredProduct) => {
     addToCart(configuredProduct);
