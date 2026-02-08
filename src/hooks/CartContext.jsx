@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect, useCallback } from 'react';
+import { fetchCategories, fetchProducts } from '../utils/utils';
 
 export const CartContext = createContext(null);
 
@@ -8,7 +9,28 @@ export const CartProvider = ({ children }) => {
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [couponCode, setCouponCode] = useState('');
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [productCount, setProductCount] = useState(50);
+  const [selectedProductId, setSelectedProductId] = useState(null);
 
+  useEffect(() => {
+    const fetchCategoriesData = async () => {
+      const fetchedCategories = await fetchCategories();
+      setCategories(fetchedCategories);
+    };
+    fetchCategoriesData();
+  }, []);
+
+  useEffect(() => {
+    const fetchProductsData = async () => {
+      const fetchedProducts = await fetchProducts(productCount);
+      setProducts(fetchedProducts);
+    };
+    fetchProductsData();
+  }, [productCount]);
+
+  
   // Load cart from localStorage on mount
   useEffect(() => {
     try {
@@ -171,15 +193,11 @@ export const CartProvider = ({ children }) => {
   };
 
   const handleUpdateQuantity = (itemId, newQuantity) => {
-    setCartItems((prev) =>
-    prev?.map((item) =>
-    item?.id === itemId ? { ...item, quantity: Math.max(1, newQuantity) } : item
-    )
-    );
+    setCartItems(cartItems?.map((item) => item?.id === itemId ? { ...item, quantity: Math.max(1, newQuantity) } : item));
   };
 
   const handleRemoveItem = (itemId) => {
-    setCartItems((prev) => prev?.filter((item) => item?.id !== itemId));
+    setCartItems(cartItems?.filter((item) => item?.id !== itemId));
   };
 
   const handleApplyCoupon = () => {
@@ -227,6 +245,12 @@ export const CartProvider = ({ children }) => {
     setIsCheckoutOpen,
     isCheckoutOpen,
     couponCode,
+    categories,
+    products,
+    productCount,
+    setProductCount,
+    selectedProductId,
+    setSelectedProductId,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

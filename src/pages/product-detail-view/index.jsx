@@ -19,21 +19,22 @@ import { fetchPexelsImages } from '../../utils/utils';
 
 const ProductDetailView = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const initialProduct = location?.state?.product;
-  const [product, setProduct] = useState(initialProduct);
-  const [loading, setLoading] = useState(!initialProduct);
+  const { selectedProductId, products, setSelectedProductId } = useCart();
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(!product);
   const [activeTab, setActiveTab] = useState('overview');
-  const { addToCart } = useCart();
 
-  console.log(`product: ${JSON.stringify(product, null, 2)}`);
   useEffect(() => {
-    const handleScroll = () => {
-      console.log('Scroll position:', window.scrollY);
+    return () => {
+      setSelectedProductId(null);
     };
+  }, [setSelectedProductId]);
 
-    window.addEventListener('scroll', handleScroll);
-  }, []);
+  useEffect(() => {
+    if (selectedProductId === null) {
+      navigate('/product-assessment-dashboard');
+    }
+  }, [selectedProductId, navigate]);
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -44,6 +45,7 @@ const ProductDetailView = () => {
         const mockProduct = {
           id: 1,
           name: "Premium Wireless Earbuds Pro",
+          title: "Premium Wireless Earbuds Pro",
           sku: "WEP-2024-001",
           description: `Experience superior audio quality with our Premium Wireless Earbuds Pro. Featuring advanced noise cancellation technology, these earbuds deliver crystal-clear sound whether you're commuting, working out, or relaxing at home. The ergonomic design ensures all-day comfort, while the long-lasting battery provides up to 8 hours of continuous playback on a single charge.\n\nWith IPX7 water resistance, these earbuds can withstand sweat and light rain, making them perfect for active lifestyles. The intuitive touch controls allow you to manage calls, adjust volume, and control playback without reaching for your device.`,
           price: 299.99,
@@ -102,39 +104,33 @@ const ProductDetailView = () => {
             "Voice Assistant": "Siri, Google Assistant compatible"
           }
         };
-
-        console.log("Product Title:", product.title || product.name);
+        const selectedProduct = products?.find((p) => p?.id === selectedProductId);
 
         // Fetch images from Pexels based on product name/category
-        const pexelsImages = await fetchPexelsImages(product?.title ?? product?.name, 5);
+        const pexelsImages = await fetchPexelsImages(selectedProduct?.title ?? selectedProduct?.name, 5);
 
         // Merge Pexels images with mock product
         const productWithImages = {
           ...mockProduct,
-          ...product,
+          ...selectedProduct,
           images: pexelsImages.length > 0 
             ? pexelsImages // Use Pexels images if available
             : mockProduct.images, // Fall back to mock images if Pexels fails
           imageSource: pexelsImages.length > 0 ? 'pexels' : 'default'
         };
-        productWithImages.images[0] = {...productWithImages.images[0], url: product?.image};
+        productWithImages.images[0] = {...productWithImages.images[0], url: selectedProduct?.image};
 
         setProduct(productWithImages);
-        setLoading(false);
       } catch (error) {
         console.error('Error loading product:', error);
-        setLoading(false);
         throw new Error('ERR_PROD_LOAD_FAIL');
+      } finally {
+        setLoading(false);
       }
     };
 
     loadProduct();
-  }, [location?.search, product?.name]);
-
-  const handleAddToCart = useCallback((configuredProduct) => {
-    addToCart(configuredProduct);
-    navigate('/shopping-cart-management');
-  }, [addToCart, navigate]);
+  }, [selectedProductId]);
 
   const tabs = [
   { id: 'overview', label: 'Overview', icon: 'Info' },
@@ -170,7 +166,7 @@ const ProductDetailView = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" key={selectedProductId}>
       <Header />
       <PerformanceMonitor />
       <AssessmentProgressIndicator />
@@ -199,7 +195,7 @@ const ProductDetailView = () => {
             {/* Right Column - Info & Configuration */}
             <div className="space-y-6 md:space-y-8">
               <ProductInfo product={product} />
-              <ProductConfiguration product={product} onAddToCart={handleAddToCart} />
+              <ProductConfiguration product={product} />
             </div>
           </div>
 
@@ -243,7 +239,7 @@ const ProductDetailView = () => {
 
               {activeTab === 'reviews' &&
               <CustomerReviews
-                productId={product?.id}
+                productId={selectedProductId}
                 averageRating={product?.rating}
                 totalReviews={product?.reviewCount} />
 
@@ -252,7 +248,7 @@ const ProductDetailView = () => {
           </div>
 
           {/* Related Products */}
-          <RelatedProducts currentProductId={product?.id} category={product?.category} />
+          <RelatedProducts currentProductId={selectedProductId} category={product?.category} />
         </div>
       </div>
     </div>);

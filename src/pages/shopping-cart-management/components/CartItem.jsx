@@ -1,32 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Image from '../../../components/AppImage';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
+import { useCart } from '../../../hooks/useCart';
 
-const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
-  const [quantity, setQuantity] = useState(item?.quantity);
+const CartItem = ({ item }) => {
   const [intervalId, setIntervalId] = useState(null);
 
-  const handleQuantityChange = (e) => {
-    const value = parseInt(e?.target?.value) || 1;
-    setQuantity(value);
-  };
+  const { updateQuantity, removeFromCart } = useCart();
 
-  const startAutoIncrement = () => {
+  const handleQuantityChange = useCallback((e) => {
+    const value = parseInt(e?.target?.value) || 1;
+    updateQuantity(item?.id, value);
+  }, [updateQuantity, item?.id]);
+
+  const startAutoIncrement = useCallback(() => {
     const id = setInterval(() => {
-      setQuantity(prev => prev + 1);
+      updateQuantity(item?.id, item?.quantity + 1);
     }, 1000);
     setIntervalId(id);
-  };
+  }, [updateQuantity, item?.id]);
 
-  useEffect(() => {
-    if (quantity !== item?.quantity) {
-      onUpdateQuantity(item?.id, quantity);
-    }
-  }, [quantity]);
-
-  const subtotal = (item?.price * quantity)?.toFixed(2);
+  const subtotal = (item?.price * item?.quantity)?.toFixed(2);
 
   return (
     <div className="flex flex-col md:flex-row gap-4 md:gap-6 p-4 md:p-6 bg-card border border-border rounded-lg hover:shadow-md transition-shadow duration-250">
@@ -61,12 +57,12 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
               variant="outline"
               size="sm"
               iconName="Minus"
-              onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              disabled={quantity <= 1}
+              onClick={() => updateQuantity(item?.id, Math.max(1, item?.quantity - 1))}
+              disabled={item?.quantity <= 1}
             />
             <Input
               type="number"
-              value={quantity}
+              value={item?.quantity}
               onChange={handleQuantityChange}
               className="w-16 md:w-20 text-center"
               min="1"
@@ -75,7 +71,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
               variant="outline"
               size="sm"
               iconName="Plus"
-              onClick={() => setQuantity(quantity + 1)}
+              onClick={() => updateQuantity(item?.id, item?.quantity + 1)}
             />
           </div>
 
@@ -108,8 +104,8 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
             size="sm"
             iconName="Trash2"
             iconPosition="left"
-            onClick={() => onRemove(item?.id)}
-            className="text-error hover:text-error"
+            onClick={() => removeFromCart(item?.id)}
+            className="text-error"
           >
             Remove
           </Button>

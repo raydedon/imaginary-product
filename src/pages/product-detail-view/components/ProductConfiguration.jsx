@@ -1,40 +1,37 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Button from '../../../components/ui/Button';
 import Icon from '../../../components/AppIcon';
-
-const ProductConfiguration = ({ product, onAddToCart }) => {
-  const [quantity, setQuantity] = useState(undefined);
+import { useCart } from '../../../hooks/useCart';
+import { useNavigate } from 'react-router-dom';
+const ProductConfiguration = ({ product }) => {
+  const navigate = useNavigate();
+  const [quantity, setQuantity] = useState(1);
   const [selectedColor, setSelectedColor] = useState(product?.colors?.[0]);
   const [selectedSize, setSelectedSize] = useState(product?.sizes?.[0]);
-
+  const { addToCart } = useCart();
   useEffect(() => {
     setInterval(() => {
       console.log('Configuration state check:', { quantity, selectedColor, selectedSize });
     }, 2000);
   }, [quantity, selectedColor, selectedSize]);
 
-  useEffect(() => {
-    if (quantity === undefined) {
-      setQuantity(1);
-    }
+  const incrementQuantity = useCallback(() => {
+    setQuantity(prev => Math.min((prev || 1) + 1, product?.stock));
+  }, [product?.stock]);
+
+  const decrementQuantity = useCallback(() => {
+    setQuantity(prev => Math.max((prev || 1) - 1, 1));
   }, []);
 
-  const incrementQuantity = () => {
-    setQuantity(prev => Math.min((prev || 1) + 1, product?.stockCount));
-  };
-
-  const decrementQuantity = () => {
-    setQuantity(prev => Math.max((prev || 1) - 1, 1));
-  };
-
-  const handleAddToCart = () => {
-    onAddToCart({
+  const handleAddToCart = useCallback(() => {
+    const configuredProduct = {
       ...product,
-      quantity: quantity || 1,
       selectedColor,
       selectedSize
-    });
-  };
+    };
+    addToCart(configuredProduct, quantity);
+    navigate('/shopping-cart-management');
+  }, [product, quantity, selectedColor, selectedSize, addToCart, navigate]);
 
   return (
     <div className="space-y-4 md:space-y-6 bg-card border border-border rounded-lg p-4 md:p-6">
@@ -102,18 +99,18 @@ const ProductConfiguration = ({ product, onAddToCart }) => {
             value={quantity || ''}
             onChange={(e) => {
               const val = parseInt(e?.target?.value);
-              if (!isNaN(val) && val >= 1 && val <= product?.stockCount) {
+              if (!isNaN(val) && val >= 1 && val <= product?.stock) {
                 setQuantity(val);
               }
             }}
             className="w-16 md:w-20 h-10 md:h-12 text-center bg-background border border-border rounded-md text-foreground font-mono text-base md:text-lg"
             min="1"
-            max={product?.stockCount}
+            max={product?.stock}
           />
           
           <button
             onClick={incrementQuantity}
-            disabled={!quantity || quantity >= product?.stockCount}
+            disabled={!quantity || quantity >= product?.stock}
             className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center bg-muted border border-border rounded-md hover:bg-muted-foreground/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             aria-label="Increase quantity"
           >
@@ -121,7 +118,7 @@ const ProductConfiguration = ({ product, onAddToCart }) => {
           </button>
         </div>
         <p className="text-xs md:text-sm text-muted-foreground mt-2">
-          Maximum {product?.stockCount} items available
+          Maximum {product?.stock} items available
         </p>
       </div>
       {/* Action Buttons */}

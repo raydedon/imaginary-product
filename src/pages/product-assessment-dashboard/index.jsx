@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/ui/Header';
 import PerformanceMonitor from '../../components/ui/PerformanceMonitor';
 import FilterToolbar from './components/FilterToolbar';
 import ProductGrid from './components/ProductGrid';
 import Icon from '../../components/AppIcon';
-import { fetchProducts, fetchCategories } from '../../utils/utils';
+import { useCart } from '../../hooks/useCart';
 
 const ProductAssessmentDashboard = () => {
   const navigate = useNavigate();
@@ -15,25 +15,7 @@ const ProductAssessmentDashboard = () => {
     minPrice: null,
     maxPrice: null
   });
-  const [productCount, setProductCount] = useState(50);
-  const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-
-  useEffect(() => {
-    const fetchCategoriesData = async () => {
-      const fetchedCategories = await fetchCategories();
-      setCategories(fetchedCategories);
-    };
-    fetchCategoriesData();
-  }, []);
-
-  useEffect(() => {
-    const fetchProductsData = async () => {
-      const fetchedProducts = await fetchProducts(productCount);
-      setProducts(fetchedProducts);
-    };
-    fetchProductsData();
-  }, [productCount]);
+  const { products, categories, setProductCount, productCount, setSelectedProductId } = useCart();
 
   const filteredProducts = useMemo(() => {
     return products?.filter(product => {
@@ -62,13 +44,10 @@ const ProductAssessmentDashboard = () => {
     }, 5000);
   }, []);
 
-  const handleProductClick = (product) => {
-    navigate('/product-detail-view', { state: { product } });
-  };
-
-  const handleFilterChange = (newFilters) => {
-    setFilters(newFilters);
-  };
+  const handleProductClick = useCallback((product) => {
+    setSelectedProductId(product?.id);
+    navigate('/product-detail-view');
+  }, [navigate]);
 
   return (
     <div className="min-h-screen bg-background">

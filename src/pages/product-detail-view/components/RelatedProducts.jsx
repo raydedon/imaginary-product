@@ -1,11 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Image from '../../../components/AppImage';
 import Icon from '../../../components/AppIcon';
 import { fetchProductsByCategory } from '../../../utils/utils';
+import { useCart } from '../../../hooks/useCart';
 
 const RelatedProducts = ({ currentProductId, category }) => {
   const navigate = useNavigate();
+  const { setSelectedProductId } = useCart();
+  const handleProductClick = useCallback((product) => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setSelectedProductId(product?.id);
+  }, [setSelectedProductId]);
+
   const [relatedProducts, setRelatedProducts] = useState([]);
 
   useEffect(() => {
@@ -25,7 +32,7 @@ const RelatedProducts = ({ currentProductId, category }) => {
         {relatedProducts?.map((product) =>
         <button
           key={product?.id}
-          onClick={() => handleProductClick(product?.id)}
+          onClick={() => handleProductClick(product)}
           className="group bg-muted rounded-lg overflow-hidden hover:shadow-lg transition-all duration-250 text-left">
 
             <div className="relative overflow-hidden">
