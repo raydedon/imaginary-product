@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Header from "../../components/ui/Header";
 import PerformanceMonitor from "../../components/ui/PerformanceMonitor";
 import Icon from "../../components/AppIcon";
-import { BigNote, Note } from "../../../my-lib/components";
+import { BigNote, Note } from "@raydedon/assessment-lib";
 
 import {
   getCurrentDate,
@@ -15,7 +15,7 @@ import {
   getUnique,
   sortByProperty,
   groupByProperty,
-} from "../../../my-lib";
+} from "@raydedon/assessment-lib";
 
 const Library = () => {
   const [phoneInput, setPhoneInput] = useState("+1 (555) 123-4567");

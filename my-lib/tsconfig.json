@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ES2019",
+    "module": "ESNext",
+    "lib": ["ES2020", "DOM"],
+    "declaration": true,
+    "outDir": "dist",
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "jsx": "react",
+    "baseUrl": "./",
+
+  },
+  "include": [
+    "src/index.ts",
+    "src/datetime.ts",
+    "src/phone.ts",
+    "src/transformers.ts"
+  ],
+  "exclude": ["node_modules", "dist"]
+}

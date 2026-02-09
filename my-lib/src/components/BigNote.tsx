@@ -302,7 +302,11 @@ Mauris vitae odio a dui suscipit sodales vel scelerisque nisl. Nulla imperdiet i
 
 `.repeat(500);
 
-const BigNote = ({ title }) => {
+interface BigNoteProps {
+  title?: string;
+}
+
+const BigNote: React.FC<BigNoteProps> = ({ title = "Big Note" }) => {
   return (
     <div className="max-w-sm mx-auto bg-yellow-100 border-l-4 border-yellow-500 p-4 rounded shadow-md mt-4">
       <h2 className="text-lg font-bold text-yellow-800">{title}</h2>

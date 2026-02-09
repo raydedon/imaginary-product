@@ -1,0 +1,42 @@
+{
+  "name": "@raydedon/assessment-lib",
+  "version": "1.0.0",
+  "description": "A utility library with datetime, phone, and data transformer utilities",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsup ./src/index.ts --format cjs,esm --dts",
+    "dev": "tsup ./src/index.ts --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@types/react": "^19.2.13",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@types/lodash": "^4.17.23",
+    "libphonenumber-js": "^1.12.36",
+    "moment": "^2.30.1",
+    "react": "^18 || ^19"
+  },
+  "peerDependencies": {
+    "react": "^18 || ^19",
+    "react-dom": "^18 || ^19"
+  }
+}
