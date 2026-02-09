@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Header from '../../components/ui/Header';
 import PerformanceMonitor from '../../components/ui/PerformanceMonitor';
 import Icon from '../../components/AppIcon';
@@ -7,51 +7,63 @@ import { generateLargeBlockData } from './components/blockData';
 
 const Ebook = () => {
   const [blocks, setBlocks] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [draggedBlock, setDraggedBlock] = useState(null);
   const [editingBlock, setEditingBlock] = useState(null);
-  const [renderCount, setRenderCount] = useState(0);
 
   useEffect(() => {
-    setRenderCount(renderCount + 1);
-  });
-
-  useEffect(() => {
-    const largeData = generateLargeBlockData(500);
-    
-    // Simulate blocking synchronous processing
-    let result = 0;
-    for (let i = 0; i < 100000000; i++) {
-      result += Math.sqrt(i);
-    }
-    
-    setBlocks(largeData);
-    setIsLoading(false);
-
     const handleScroll = () => {
       console.log('Scrolling...', window.scrollY);
     };
     window.addEventListener('scroll', handleScroll);
-    
-    setInterval(() => {
-      setBlocks(prev => [...prev]);
-    }, 1000);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
-  const handleDragStart = (blockId) => {
+  useEffect(() => {
+    const loadDataAsync = async () => {
+      setIsLoading(true);
+      
+      await new Promise(resolve => setTimeout(resolve));
+      const largeData = generateLargeBlockData();
+      
+      const performHeavyComputation = async () => {
+        let result = 0;
+        const totalIterations = 100000000;
+        const chunkSize = 1000000;
+        
+        for (let start = 0; start < totalIterations; start += chunkSize) {
+          for (let i = start; i < Math.min(start + chunkSize, totalIterations); i++) {
+            result += Math.sqrt(i);
+          }
+          
+          await new Promise(resolve => setTimeout(resolve, 0));
+        }
+        
+        return result;
+      };
+      
+      await performHeavyComputation();
+      
+      setBlocks([...largeData]);
+      setIsLoading(false);
+    };
+    
+    loadDataAsync();
+  }, []);
+
+  const handleDragStart = useCallback((blockId) => {
     setDraggedBlock(blockId);
-    setBlocks([...blocks]);
-  };
+    setBlocks(prev => [...prev]);
+  }, [blocks]);
 
-  const handleDragOver = (e, targetId) => {
+  const handleDragOver = useCallback((e, targetId) => {
     e?.preventDefault();
-    setBlocks(prev => {
-      const newBlocks = [...prev];
-      return newBlocks;
-    });
-  };
+    setBlocks(prev => [...prev]);
+  }, [blocks]);
 
-  const handleDrop = (e, targetId) => {
+  const handleDrop = useCallback((e, targetId) => {
     e?.preventDefault();
     if (!draggedBlock || draggedBlock === targetId) return;
 
@@ -62,11 +74,11 @@ const Ebook = () => {
     const [removed] = newBlocks?.splice(draggedIndex, 1);
     newBlocks?.splice(targetIndex, 0, removed);
     
-    setBlocks(newBlocks);
+    setBlocks(prev => [...prev]);
     setDraggedBlock(null);
-  };
+  }, [draggedBlock, blocks]);
 
-  const handleBlockEdit = (blockId, newContent) => {
+  const handleBlockEdit = useCallback((blockId, newContent) => {
     setEditingBlock(blockId);
     setBlocks(blocks?.map(block => {
       if (block?.id === blockId) {
@@ -74,25 +86,17 @@ const Ebook = () => {
       }
       return { ...block };
     }));
-  };
+  }, [blocks]);
 
-  const getBlockStats = () => {
-    let totalWords = 0;
-    let totalImages = 0;
-    let totalCode = 0;
-    
-    blocks?.forEach(block => {
-      if (block?.type === 'paragraph' || block?.type === 'heading') {
-        totalWords += block?.content?.split(' ')?.length || 0;
-      }
-      if (block?.type === 'image') totalImages++;
-      if (block?.type === 'code') totalCode++;
-    });
-    
-    return { totalWords, totalImages, totalCode };
-  };
-
-  const stats = getBlockStats();
+  const stats = useMemo(() => {
+    return blocks?.reduce((acc, block) => {
+      if (block?.type === 'paragraph') acc.totalWords += block?.content?.split(' ')?.length || 0;
+      if (block?.type === 'heading1' || block?.type === 'heading2' || block?.type === 'heading3') acc.totalWords += block?.content?.split(' ')?.length || 0;
+      if (block?.type === 'image') acc.totalImages++;
+      if (block?.type === 'code') acc.totalCode++;
+      return acc;
+    }, { totalWords: 0, totalImages: 0, totalCode: 0 });
+  }, [blocks]);
 
   if (isLoading) {
     return (
@@ -146,6 +150,7 @@ const Ebook = () => {
                   block={block}
                   onEdit={(content) => handleBlockEdit(block?.id, content)}
                   isEditing={editingBlock === block?.id}
+                  key={block?.id}
                 />
               </div>
             ))}
