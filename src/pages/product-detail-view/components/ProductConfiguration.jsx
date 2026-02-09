@@ -9,11 +9,6 @@ const ProductConfiguration = ({ product }) => {
   const [selectedColor, setSelectedColor] = useState(product?.colors?.[0]);
   const [selectedSize, setSelectedSize] = useState(product?.sizes?.[0]);
   const { addToCart } = useCart();
-  useEffect(() => {
-    setInterval(() => {
-      console.log('Configuration state check:', { quantity, selectedColor, selectedSize });
-    }, 2000);
-  }, [quantity, selectedColor, selectedSize]);
 
   const incrementQuantity = useCallback(() => {
     setQuantity(prev => Math.min((prev || 1) + 1, product?.stock));

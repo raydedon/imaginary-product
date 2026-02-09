@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { fetchCategories, fetchProducts } from '../utils/utils';
 
 export const CartContext = createContext(null);
@@ -9,26 +10,39 @@ export const CartProvider = ({ children }) => {
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [couponCode, setCouponCode] = useState('');
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-  const [categories, setCategories] = useState([]);
-  const [products, setProducts] = useState([]);
   const [productCount, setProductCount] = useState(50);
   const [selectedProductId, setSelectedProductId] = useState(null);
 
-  useEffect(() => {
-    const fetchCategoriesData = async () => {
-      const fetchedCategories = await fetchCategories();
-      setCategories(fetchedCategories);
-    };
-    fetchCategoriesData();
-  }, []);
+  // Fetch categories using React Query
+  const {
+    data: categories = [],
+    isLoading: isCategoriesLoading,
+    error: categoriesError,
+    refetch: refetchCategories
+  } = useQuery({
+    queryKey: ['categories'],
+    queryFn: fetchCategories,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    cacheTime: 1000 * 60 * 10, // 10 minutes
+    retry: 2,
+    refetchOnWindowFocus: false,
+  });
 
-  useEffect(() => {
-    const fetchProductsData = async () => {
-      const fetchedProducts = await fetchProducts(productCount);
-      setProducts(fetchedProducts);
-    };
-    fetchProductsData();
-  }, [productCount]);
+  // Fetch products using React Query
+  const {
+    data: products = [],
+    isLoading: isProductsLoading,
+    error: productsError,
+    refetch: refetchProducts
+  } = useQuery({
+    queryKey: ['products', productCount],
+    queryFn: () => fetchProducts(productCount),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    cacheTime: 1000 * 60 * 10, // 10 minutes
+    retry: 2,
+    enabled: productCount > 0, // Only fetch if productCount is valid
+    refetchOnWindowFocus: false,
+  });
 
   
   // Load cart from localStorage on mount
@@ -245,8 +259,18 @@ export const CartProvider = ({ children }) => {
     setIsCheckoutOpen,
     isCheckoutOpen,
     couponCode,
+    
+    // React Query data and states
     categories,
     products,
+    isCategoriesLoading,
+    isProductsLoading,
+    categoriesError,
+    productsError,
+    refetchCategories,
+    refetchProducts,
+    
+    // Product count
     productCount,
     setProductCount,
     selectedProductId,
