@@ -12,16 +12,6 @@ const Ebook = () => {
   const [editingBlock, setEditingBlock] = useState(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      console.log('Scrolling...', window.scrollY);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
-
-  useEffect(() => {
     const loadDataAsync = async () => {
       setIsLoading(true);
       
