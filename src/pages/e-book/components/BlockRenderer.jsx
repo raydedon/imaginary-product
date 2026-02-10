@@ -122,12 +122,7 @@ const BlockRenderer = ({ block, onEdit, isEditing }) => {
         return (
           <button
             className="bg-primary text-primary-foreground px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors my-4"
-            onClick={() => {
-              console.log('Button clicked:', block?.id);
-              for (let i = 0; i < 10000000; i++) {
-                Math.random();
-              }
-            }}
+            onClick={block?.onClick}
           >
             {block?.content}
           </button>

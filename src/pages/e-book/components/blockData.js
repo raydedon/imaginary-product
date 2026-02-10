@@ -200,7 +200,10 @@ console.log(fibonacci(10));`,
           id: `block-${i}`,
           type: "button",
           content: `Action Button ${i}`,
-          // `TODO: should be able to provide a custom callback, it could open a modal dialog. or an external redirection`
+          onClick: () => {
+            console.log(`Action Button ${i} clicked`);
+            // `TODO: should be able to provide a custom callback, it could open a modal dialog. or an external redirection`
+          },
         });
         break;
 
