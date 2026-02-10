@@ -25,6 +25,17 @@ A React-based project utilizing the frontend technologies and tools for building
 - **Animation** - Framer Motion for smooth UI animations
 - **Testing** - Jest and React Testing Library setup
 
+### 📚 Custom Library
+
+This project includes a separate library package located in the `my-lib/` folder:
+
+- **Package Name**: `@raydedon/assessment-lib`
+- **Purpose**: Custom reusable components and utilities
+- **Build & Publish**: Follows its own independent npm publish and build cycle
+- **Usage**: Can be published to npm and used across multiple projects
+
+The library has its own `package.json` and build configuration, allowing it to be developed, versioned, and published independently from the main application.
+
 ### 📋 Prerequisites
 
 - Node.js (v14.x or higher, we recommend 20.19.6)
@@ -50,7 +61,7 @@ A React-based project utilizing the frontend technologies and tools for building
 
 ```
 react_app/
-├── my-lib/             # A custom library (could be published to npm)
+├── my-lib/             # @raydedon/assessment-lib - Independent npm package
 ├── public/             # Static assets
 ├── src/
 │   ├── components/     # Reusable UI components
