@@ -6,3 +6,9 @@ package-lock.json
 .vscode/
 .idea/
 vite.config.*s.*
+.env
+my-lib/dist
+my-lib/node_modules
+my-lib/.env
+my-lib/.gitignore
+
