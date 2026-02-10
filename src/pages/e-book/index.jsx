@@ -45,12 +45,12 @@ const Ebook = () => {
 
   const handleDragStart = useCallback((blockId) => {
     setDraggedBlock(blockId);
-    setBlocks(prev => [...prev]);
+    setBlocks([...blocks]);
   }, [blocks]);
 
   const handleDragOver = useCallback((e, targetId) => {
     e?.preventDefault();
-    setBlocks(prev => [...prev]);
+    setBlocks([...blocks]);
   }, [blocks]);
 
   const handleDrop = useCallback((e, targetId) => {
@@ -64,7 +64,7 @@ const Ebook = () => {
     const [removed] = newBlocks?.splice(draggedIndex, 1);
     newBlocks?.splice(targetIndex, 0, removed);
     
-    setBlocks(prev => [...prev]);
+    setBlocks([...newBlocks]);
     setDraggedBlock(null);
   }, [draggedBlock, blocks]);
 
