@@ -1,5 +1,7 @@
 # Imaginary Product
 
+**🌐 Live Demo:** [https://imaginary-product.vercel.app/](https://imaginary-product.vercel.app/)
+
 <p align="left">
   <img src=".assets/products.png" alt="products" width="180" style="margin-right:10px;"/>
   <img src=".assets/e-book.png" alt="e-book" width="180" style="margin-right:10px;"/>
@@ -123,6 +125,8 @@ npm run build
 
 The application is deployed on **Vercel** with automatic deployments configured.
 
+**Live URL:** [https://imaginary-product.vercel.app/](https://imaginary-product.vercel.app/)
+
 ### 🔄 CI/CD Pipeline
 
 This project uses GitHub Actions for Continuous Integration and Vercel for Continuous Deployment:
@@ -131,5 +135,3 @@ This project uses GitHub Actions for Continuous Integration and Vercel for Conti
 - **CD**: Automatic deployments to Vercel
   - Production: Deploys on push to `main` branch
   - Preview: Creates preview deployments for every PR
-
-For detailed CI/CD configuration and setup instructions, see [CI-CD-SETUP.md](./CI-CD-SETUP.md)
