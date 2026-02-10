@@ -80,7 +80,7 @@ const Header = () => {
                   size={18} 
                   color={isActivePath(item?.path) ? 'var(--color-primary-foreground)' : 'currentColor'}
                 />
-                <span className="font-medium text-sm">{item?.label}</span>
+                <span className="font-medium text-sm whitespace-nowrap">{item?.label}</span>
                 {isActivePath(item?.path) && (
                   <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent" />
                 )}
