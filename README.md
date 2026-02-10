@@ -120,3 +120,16 @@ Build the application for production:
 ```bash
 npm run build
 ```
+
+The application is deployed on **Vercel** with automatic deployments configured.
+
+### 🔄 CI/CD Pipeline
+
+This project uses GitHub Actions for Continuous Integration and Vercel for Continuous Deployment:
+
+- **CI**: Automated testing, linting, and build verification on every push/PR
+- **CD**: Automatic deployments to Vercel
+  - Production: Deploys on push to `main` branch
+  - Preview: Creates preview deployments for every PR
+
+For detailed CI/CD configuration and setup instructions, see [CI-CD-SETUP.md](./CI-CD-SETUP.md)
