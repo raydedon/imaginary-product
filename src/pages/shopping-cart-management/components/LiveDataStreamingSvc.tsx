@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import Icon from '../../../components/AppIcon';
 
 const LiveDataStreamingSvc = () => {
-
-  const persistentArray = [];
+  const persistentArray = useMemo(() => [], []);
   
   useEffect(() => {
     setInterval(() => {
@@ -17,7 +16,7 @@ const LiveDataStreamingSvc = () => {
 
     }, 2000);
 
-  }, []);
+  }, [persistentArray]);
 
   return (
     <div className="bg-card border border-border rounded-lg p-4 md:p-6 shadow-md">

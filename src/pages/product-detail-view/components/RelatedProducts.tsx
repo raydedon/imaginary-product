@@ -9,7 +9,7 @@ const RelatedProducts = ({ currentProductId, category }) => {
   const handleProductClick = useCallback((product) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     navigate(`/product-detail-view/${product?.id}/`);
-  }, []);
+  }, [navigate]);
 
   const [relatedProducts, setRelatedProducts] = useState([]);
 

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 const AssessmentProgressContext = createContext();
@@ -19,7 +19,7 @@ export const AssessmentProgressProvider = ({ children }) => {
     '/user-authentication': { identified: 0, resolved: 0, total: 5 }
   });
 
-  const markProblemIdentified = (path, problemId) => {
+  const markProblemIdentified = (path, _problemId) => {
     setProgress(prev => ({
       ...prev,
       [path]: {
@@ -29,7 +29,7 @@ export const AssessmentProgressProvider = ({ children }) => {
     }));
   };
 
-  const markProblemResolved = (path, problemId) => {
+  const markProblemResolved = (path, _problemId) => {
     setProgress(prev => ({
       ...prev,
       [path]: {

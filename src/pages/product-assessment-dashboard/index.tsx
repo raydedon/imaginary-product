@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/ui/Header';
 import PerformanceMonitor from '../../components/ui/PerformanceMonitor';
@@ -15,7 +15,7 @@ const ProductAssessmentDashboard = () => {
     minPrice: null,
     maxPrice: null
   });
-  const { products, categories, setProductCount, productCount, setSelectedProductId } = useCart();
+  const { products, categories, setProductCount, productCount, setSelectedProductId: _setSelectedProductId } = useCart();
 
   const filteredProducts = useMemo(() => {
     return products?.filter(product => {

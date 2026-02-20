@@ -24,7 +24,7 @@ export function validatePhoneNumber(phoneNumber: string, country: CountryCode = 
   try {
     const phoneNumberObj = libphonenumber.parsePhoneNumber(phoneNumber, country);
     return phoneNumberObj.isValid();
-  } catch (error) {
+  } catch {
     return false;
   }
 }
@@ -40,7 +40,7 @@ export function formatPhoneNumber(phoneNumber: string, country: CountryCode = 'U
   try {
     const phoneNumberObj = libphonenumber.parsePhoneNumber(phoneNumber, country);
     return phoneNumberObj.formatInternational();
-  } catch (error) {
+  } catch {
     return phoneNumber;
   }
 }
@@ -56,7 +56,7 @@ export function getPhoneNumberType(phoneNumber: string, country: CountryCode = '
   try {
     const phoneNumberObj = libphonenumber.parsePhoneNumber(phoneNumber, country);
     return phoneNumberObj.getType();
-  } catch (error) {
+  } catch {
     return 'UNKNOWN';
   }
 }
@@ -72,7 +72,7 @@ export function getCountryCode(phoneNumber: string, country: CountryCode = 'US')
   try {
     const phoneNumberObj = libphonenumber.parsePhoneNumber(phoneNumber, country);
     return phoneNumberObj.country as CountryCode | null;
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -102,7 +102,7 @@ export function parsePhone(phoneNumber: string, country: CountryCode = 'US'): Pa
       country: phoneNumberObj.country,
       type: phoneNumberObj.getType(),
     };
-  } catch (error) {
+  } catch {
     return {
       isValid: false,
       error: 'Invalid phone number',

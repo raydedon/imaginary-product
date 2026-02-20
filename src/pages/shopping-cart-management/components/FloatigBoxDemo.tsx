@@ -113,7 +113,7 @@ const FloatigBoxDemo = () => {
             >
               <div 
                 className="bg-card border border-border rounded-lg p-6 max-w-md"
-                onClick={(e) => alert('Modal content clicked!')}
+                onClick={(_e) => alert('Modal content clicked!')}
               >
                 <h4 className="text-lg font-semibold text-foreground mb-2">Random Quote</h4>
                 <p className="text-sm text-muted-foreground mb-4">

@@ -48,12 +48,12 @@ const Ebook = () => {
     setBlocks([...blocks]);
   }, [blocks]);
 
-  const handleDragOver = useCallback((e, targetId) => {
+  const handleDragOver = useCallback((e, _targetId) => {
     e?.preventDefault();
     setBlocks([...blocks]);
   }, [blocks]);
 
-  const handleDrop = useCallback((e, targetId) => {
+  const handleDrop = useCallback((e, _targetId) => {
     e?.preventDefault();
     if (!draggedBlock || draggedBlock === targetId) return;
 
@@ -78,7 +78,7 @@ const Ebook = () => {
     }));
   }, [blocks]);
 
-  const stats = useMemo(() => {
+  const _stats = useMemo(() => {
     return blocks?.reduce((acc, block) => {
       if (block?.type === 'paragraph') acc.totalWords += block?.content?.split(' ')?.length || 0;
       if (block?.type === 'heading1' || block?.type === 'heading2' || block?.type === 'heading3') acc.totalWords += block?.content?.split(' ')?.length || 0;
@@ -123,7 +123,7 @@ const Ebook = () => {
           </div>
 
           <div className="space-y-2">
-            {blocks?.map((block, index) => (
+          {blocks?.map((block, _index) => (
               <div
                 key={block?.id}
                 draggable

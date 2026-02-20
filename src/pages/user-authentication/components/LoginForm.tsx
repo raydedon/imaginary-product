@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Input from '../../../components/ui/Input';
 import Button from '../../../components/ui/Button';
 import Icon from '../../../components/AppIcon';
@@ -11,14 +11,15 @@ const LoginForm = ({ onSubmit, onSwitchToRegister }) => {
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    const handleKeyPress = (e) => {
+    const handleKeyPress = (e: KeyboardEvent) => {
       if (e?.key === 'Enter' && email && password) {
         handleSubmit(e);
       }
     };
     
     window.addEventListener('keypress', handleKeyPress);
-  }, [email, password]);
+    return () => window.removeEventListener('keypress', handleKeyPress);
+  }, [email, password, handleSubmit]);
 
   useEffect(() => {
     if (Object.keys(errors)?.length > 0) {
@@ -28,8 +29,8 @@ const LoginForm = ({ onSubmit, onSwitchToRegister }) => {
     }
   }, [errors]);
 
-  const validateForm = () => {
-    const newErrors = {};
+  const validateForm = useCallback((): Record<string, string> => {
+    const newErrors: Record<string, string> = {};
     
     if (!email) {
       newErrors.email = 'Email is required';
@@ -44,12 +45,12 @@ const LoginForm = ({ onSubmit, onSwitchToRegister }) => {
     }
     
     return newErrors;
-  };
+  }, [email, password]);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e?.preventDefault();
     
-    const validationErrors = validateForm();
+    const validationErrors = validateForm(email, password);
     if (Object.keys(validationErrors)?.length > 0) {
       setErrors(validationErrors);
       return;
@@ -68,7 +69,7 @@ const LoginForm = ({ onSubmit, onSwitchToRegister }) => {
       }
       setIsLoading(false);
     }, 1500);
-  };
+  }, [email, password, onSubmit, setIsLoading, setErrors, validateForm, rememberMe]);
 
   const emailValue = email === undefined ? '' : email;
 
@@ -80,7 +81,7 @@ const LoginForm = ({ onSubmit, onSwitchToRegister }) => {
           label="Email Address"
           placeholder="Enter your email"
           value={emailValue}
-          onChange={(e) => setEmail(e?.target?.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e?.target?.value)}
           error={errors?.email}
           required
           className="mb-4"
@@ -92,7 +93,7 @@ const LoginForm = ({ onSubmit, onSwitchToRegister }) => {
           label="Password"
           placeholder="Enter your password"
           value={password}
-          onChange={(e) => setPassword(e?.target?.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e?.target?.value)}
           error={errors?.password}
           required
         />
@@ -102,7 +103,7 @@ const LoginForm = ({ onSubmit, onSwitchToRegister }) => {
           <input
             type="checkbox"
             checked={rememberMe}
-            onChange={(e) => setRememberMe(e?.target?.checked)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRememberMe(e?.target?.checked)}
             className="w-4 h-4 rounded border-border bg-input text-primary focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
           />
           <span className="text-sm text-foreground">Remember me</span>

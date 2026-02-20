@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+// Block data generation utilities
 export const generateLargeBlockData = (count = 500) => {
   const blocks = [];
 

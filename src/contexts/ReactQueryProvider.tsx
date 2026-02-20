@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import React from 'react';
 
-// Create a client
+// Create a client - moved to separate file to fix fast-refresh warning
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

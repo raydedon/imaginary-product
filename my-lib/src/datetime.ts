@@ -1,4 +1,4 @@
-import moment, { Moment, MomentInput } from 'moment';
+import moment, { MomentInput } from 'moment';
 
 /**
  * Get current date formatted as "Month DD, YYYY"

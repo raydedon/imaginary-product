@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import Image from '../../../components/AppImage';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
@@ -6,7 +6,7 @@ import Input from '../../../components/ui/Input';
 import { useCart } from '../../../hooks/useCart';
 
 const CartItem = ({ item }) => {
-  const [intervalId, setIntervalId] = useState(null);
+  const [_intervalId, _setIntervalId] = useState(null);
 
   const { updateQuantity, removeFromCart } = useCart();
 
@@ -19,8 +19,8 @@ const CartItem = ({ item }) => {
     const id = setInterval(() => {
       updateQuantity(item?.id, item?.quantity + 1);
     }, 1000);
-    setIntervalId(id);
-  }, [updateQuantity, item?.id]);
+    _setIntervalId(id);
+  }, [updateQuantity, item?.id, item?.quantity]);
 
   const subtotal = (item?.price * item?.quantity)?.toFixed(2);
 

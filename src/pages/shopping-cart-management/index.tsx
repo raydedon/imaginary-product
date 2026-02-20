@@ -1,9 +1,8 @@
-import React, { useState, createContext, useContext } from 'react';
+import React from 'react';
 import Header from '../../components/ui/Header';
 import PerformanceMonitor from '../../components/ui/PerformanceMonitor';
 import AssessmentProgressIndicator from '../../components/ui/AssessmentProgress';
 import { ErrorBoundaryStatusIndicator } from '../../components/ui/ErrorBoundaryStatus';
-import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import CartItem from './components/CartItem';
 import CartSummary from './components/CartSummary';
@@ -17,7 +16,7 @@ import APIUsecaseDemo from './components/APIUsecaseDemo';
 import { useCart } from '../../hooks/useCart';
 
 const ShoppingCartManagement = () => {
-  const { cartItems, isLoading, calculateSubtotal, calculateTax, calculateShipping, calculateDiscount, calculateTotal, handleUpdateQuantity, handleRemoveItem, handleApplyCoupon, setIsCheckoutOpen, couponCode, isCheckoutOpen, getGrandTotal, setCouponCode, clearCart } = useCart();
+  const { cartItems, isLoading: _isLoading, calculateSubtotal, calculateTax, calculateShipping, calculateDiscount, calculateTotal, handleUpdateQuantity, handleRemoveItem, handleApplyCoupon, setIsCheckoutOpen, couponCode, isCheckoutOpen, getGrandTotal: _getGrandTotal, setCouponCode, clearCart } = useCart();
 
   return (
     <div className="min-h-screen bg-background">

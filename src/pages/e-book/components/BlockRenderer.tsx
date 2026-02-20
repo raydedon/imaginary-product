@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Icon from '../../../components/AppIcon';
 
-const BlockRenderer = ({ block, onEdit, isEditing }) => {
-  const [localContent, setLocalContent] = useState(block?.content);
+const BlockRenderer = ({ block, onEdit: _onEdit, isEditing: _isEditing }) => {
+  const [_localContent, _setLocalContent] = useState(block?.content);
   const [hovered, setHovered] = useState(false);
 
   useEffect(() => {

@@ -4,6 +4,7 @@ import { fetchCategories, fetchProducts } from '../utils/utils';
 
 export const CartContext = createContext(null);
 
+// Move CartProvider to separate file to fix fast-refresh warning
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);

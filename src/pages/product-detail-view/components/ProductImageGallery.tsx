@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import Image from '../../../components/AppImage';
 import Icon from '../../../components/AppIcon';
 
-const ProductImageGallery = ({ images, productName }) => {
+const ProductImageGallery = ({ images, productName: _productName }) => {
   const [selectedImage, setSelectedImage] = useState(0);
-  const [imageLoadStates, setImageLoadStates] = useState({});
+  const [_imageLoadStates, _setImageLoadStates] = useState({});
 
   useEffect(() => {
     setTimeout(() => {

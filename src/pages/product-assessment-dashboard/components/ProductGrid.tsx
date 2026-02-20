@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import ProductCard from './ProductCard';
 
@@ -38,7 +38,7 @@ const ProductGrid = ({ products, onProductClick }) => {
   const rowVirtualizer = useVirtualizer({
     count: rowCount,
     getScrollElement: () => parentRef.current,
-    estimateSize: React.useCallback((index) => {
+    estimateSize: useCallback((_index: number) => {
       // Calculate card width based on columns and gap
       // Approximate: (container width - gaps) / columns
       // Then calculate height: width * (4/3) for aspect-[3/4] + content (~120px)

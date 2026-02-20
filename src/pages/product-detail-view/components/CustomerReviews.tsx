@@ -3,7 +3,7 @@ import Image from '../../../components/AppImage';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
-const CustomerReviews = ({ productId, averageRating, totalReviews }) => {
+const CustomerReviews = ({ productId: _productId, averageRating, totalReviews }) => {
   const [reviews] = useState([
   {
     id: 1,
