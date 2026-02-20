@@ -11,7 +11,6 @@ export const CartProvider = ({ children }) => {
   const [couponCode, setCouponCode] = useState('');
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [productCount, setProductCount] = useState(50);
-  const [selectedProductId, setSelectedProductId] = useState(null);
 
   // Fetch categories using React Query
   const {
@@ -273,8 +272,6 @@ export const CartProvider = ({ children }) => {
     // Product count
     productCount,
     setProductCount,
-    selectedProductId,
-    setSelectedProductId,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

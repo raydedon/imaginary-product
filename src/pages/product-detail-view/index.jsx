@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import Header from '../../components/ui/Header';
 import PerformanceMonitor from '../../components/ui/PerformanceMonitor';
@@ -19,24 +18,33 @@ import { fetchPexelsImages } from '../../utils/utils';
 
 const ProductDetailView = () => {
   const navigate = useNavigate();
-  const { selectedProductId, products, setSelectedProductId } = useCart();
+  const { productId } = useParams();
+  const numericProductId = Number(productId);
+  const hasValidProductId = Number.isFinite(numericProductId) && numericProductId > 0;
+  const { products, isProductsLoading } = useCart();
   const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(!product);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
-    return () => {
-      setSelectedProductId(null);
-    };
-  }, [setSelectedProductId]);
-
-  useEffect(() => {
-    if (selectedProductId === null) {
+    if (!hasValidProductId) {
       navigate('/product-assessment-dashboard');
+      return;
     }
-  }, [selectedProductId, navigate]);
+  }, [hasValidProductId, navigate, numericProductId]);
 
   useEffect(() => {
+    if (!hasValidProductId || isProductsLoading) {
+      return;
+    }
+
+    const selectedProduct = products?.find((p) => Number(p?.id) === numericProductId);
+    if (!selectedProduct) {
+      navigate('/product-assessment-dashboard');
+      return;
+    }
+
+    let isMounted = true;
     const loadProduct = async () => {
       try {
         setLoading(true);
@@ -104,8 +112,6 @@ const ProductDetailView = () => {
             "Voice Assistant": "Siri, Google Assistant compatible"
           }
         };
-        const selectedProduct = products?.find((p) => p?.id === selectedProductId);
-
         // Fetch images from Pexels based on product name/category
         const pexelsImages = await fetchPexelsImages(selectedProduct?.title ?? selectedProduct?.name, 5);
 
@@ -118,19 +124,29 @@ const ProductDetailView = () => {
             : mockProduct.images, // Fall back to mock images if Pexels fails
           imageSource: pexelsImages.length > 0 ? 'pexels' : 'default'
         };
-        productWithImages.images[0] = {...productWithImages.images[0], url: selectedProduct?.image};
+        if (selectedProduct?.image && productWithImages?.images?.length > 0) {
+          productWithImages.images[0] = { ...productWithImages.images[0], url: selectedProduct.image };
+        }
 
-        setProduct(productWithImages);
+        if (isMounted) {
+          setProduct(productWithImages);
+        }
       } catch (error) {
         console.error('Error loading product:', error);
         throw new Error('ERR_PROD_LOAD_FAIL');
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     loadProduct();
-  }, [selectedProductId]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [hasValidProductId, isProductsLoading, navigate, numericProductId, products]);
 
   const tabs = [
   { id: 'overview', label: 'Overview', icon: 'Info' },
@@ -166,7 +182,7 @@ const ProductDetailView = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background" key={selectedProductId}>
+    <div className="min-h-screen bg-background" key={numericProductId}>
       <Header />
       <PerformanceMonitor />
       <AssessmentProgressIndicator />
@@ -194,8 +210,8 @@ const ProductDetailView = () => {
 
             {/* Right Column - Info & Configuration */}
             <div className="space-y-6 md:space-y-8">
-              <ProductInfo product={product} />
-              <ProductConfiguration product={product} />
+                <ProductInfo product={product} />
+                <ProductConfiguration product={product} />
             </div>
           </div>
 
@@ -239,7 +255,7 @@ const ProductDetailView = () => {
 
               {activeTab === 'reviews' &&
               <CustomerReviews
-                productId={selectedProductId}
+                productId={numericProductId}
                 averageRating={product?.rating}
                 totalReviews={product?.reviewCount} />
 
@@ -248,7 +264,7 @@ const ProductDetailView = () => {
           </div>
 
           {/* Related Products */}
-          <RelatedProducts currentProductId={selectedProductId} category={product?.category} />
+          <RelatedProducts currentProductId={numericProductId} category={product?.category} />
         </div>
       </div>
     </div>);

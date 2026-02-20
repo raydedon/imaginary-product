@@ -29,8 +29,7 @@ const ProductAssessmentDashboard = () => {
   }, [products, filters]);
 
   const handleProductClick = useCallback((product) => {
-    setSelectedProductId(product?.id);
-    navigate('/product-detail-view');
+    navigate(`/product-detail-view/${product?.id}/`);
   }, [navigate]);
 
   return (

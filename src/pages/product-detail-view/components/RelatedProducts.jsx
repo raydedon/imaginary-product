@@ -3,15 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import Image from '../../../components/AppImage';
 import Icon from '../../../components/AppIcon';
 import { fetchProductsByCategory } from '../../../utils/utils';
-import { useCart } from '../../../hooks/useCart';
 
 const RelatedProducts = ({ currentProductId, category }) => {
   const navigate = useNavigate();
-  const { setSelectedProductId } = useCart();
   const handleProductClick = useCallback((product) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    setSelectedProductId(product?.id);
-  }, [setSelectedProductId]);
+    navigate(`/product-detail-view/${product?.id}/`);
+  }, []);
 
   const [relatedProducts, setRelatedProducts] = useState([]);
 
