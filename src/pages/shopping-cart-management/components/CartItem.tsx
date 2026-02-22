@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import Image from '../../../components/AppImage';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
@@ -8,26 +8,46 @@ import type { CartItem } from '../../../contexts/CartProvider';
 
 interface CartItemProps {
   item: CartItem;
-  onUpdateQuantity: (itemId: string, quantity: number) => void;
-  onRemove: (itemId: string) => void;
 }
 
-const CartItem = ({ item, onUpdateQuantity, onRemove }: CartItemProps) => {
-  const [_intervalId, _setIntervalId] = useState<NodeJS.Timeout | null>(null);
+const CartItem = ({ item }: CartItemProps) => {
+  const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
 
-  const { updateQuantity, removeFromCart } = useCart();
+  const { handleUpdateQuantity, handleRemoveItem } = useCart();
 
   const handleQuantityChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e?.target?.value) || 1;
-    onUpdateQuantity(item?.id, value);
-  }, [updateQuantity, item?.id]);
+    handleUpdateQuantity(item?.id, value);
+  }, [item?.id, handleUpdateQuantity]);
+  // Clear interval when the component unmounts or when intervalId changes
+  useEffect(() => {
+    return () => {
+      if (intervalId) clearTimeout(intervalId);
+    };
+  }, [intervalId]);
+
 
   const startAutoIncrement = useCallback(() => {
-    const id = setInterval(() => {
-      updateQuantity(item?.id, item?.quantity + 1);
-    }, 1000);
-    _setIntervalId(id as NodeJS.Timeout);
-  }, [updateQuantity, item?.id, item?.quantity]);
+    setIntervalId(setTimeout(function _fn(_id: string, quantity: number, setIntervalId: (id: NodeJS.Timeout | null) => void) {
+      handleUpdateQuantity(_id, quantity);
+      setIntervalId(setTimeout(_fn, 1000, _id, quantity + 1, setIntervalId));
+    }, 1000, item?.id, item?.quantity + 1, setIntervalId));
+  }, [handleUpdateQuantity, item?.id, item?.quantity]);
+
+  const stopAutoIncrement = useCallback(() => {
+    if (intervalId) {
+      clearTimeout(intervalId);
+      setIntervalId(null);
+    }
+  }, [intervalId]);
+  const toggleAutoIncrement = useCallback(() => {
+    if (intervalId) {
+      stopAutoIncrement();
+    }
+    else {
+      startAutoIncrement();
+    }
+  }, [intervalId, startAutoIncrement, stopAutoIncrement]);
 
   const subtotal = (item?.price * item?.quantity)?.toFixed(2) ?? '0.00';
 
@@ -64,7 +84,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }: CartItemProps) => {
               variant="outline"
               size="sm"
               iconName="Minus"
-              onClick={() => updateQuantity(item?.id, Math.max(1, item?.quantity - 1))}
+              onClick={() => handleUpdateQuantity(item?.id, Math.max(1, item?.quantity - 1))}
               disabled={item?.quantity <= 1}
             />
             <Input
@@ -79,7 +99,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }: CartItemProps) => {
               variant="outline"
               size="sm"
               iconName="Plus"
-              onClick={() => updateQuantity(item?.id, item?.quantity + 1)}
+              onClick={() => handleUpdateQuantity(item?.id, item?.quantity + 1)}
             />
           </div>
 
@@ -88,11 +108,12 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }: CartItemProps) => {
             size="sm"
             iconName="Zap"
             iconPosition="left"
-            onClick={startAutoIncrement}
+            onClick={toggleAutoIncrement}
             className="text-warning"
           >
-            Auto +1/sec
+            {intervalId ? 'Stop' : 'Start'} Auto +1/sec
           </Button>
+
 
           <div className="flex items-center gap-2 sm:ml-auto">
             <span className="text-sm md:text-base text-muted-foreground">Subtotal:</span>
@@ -112,7 +133,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }: CartItemProps) => {
             size="sm"
             iconName="Trash2"
             iconPosition="left"
-            onClick={() => removeFromCart(item?.id)}
+            onClick={() => handleRemoveItem(item?.id)}
             className="text-error"
           >
             Remove

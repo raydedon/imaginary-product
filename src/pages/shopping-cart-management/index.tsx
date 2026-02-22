@@ -62,9 +62,7 @@ const ShoppingCartManagement = () => {
                       {cartItems?.map((item) =>
                     <CartItem
                       key={item?.id}
-                      item={item}
-                      onUpdateQuantity={handleUpdateQuantity}
-                      onRemove={handleRemoveItem} />
+                      item={item} />
 
                     )}
                     </div>
