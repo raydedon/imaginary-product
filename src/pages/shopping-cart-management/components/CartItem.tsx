@@ -11,7 +11,7 @@ interface CartItemProps {
 }
 
 const CartItem = ({ item }: CartItemProps) => {
-  const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
   const { handleUpdateQuantity, handleRemoveItem } = useCart();
 
@@ -19,35 +19,35 @@ const CartItem = ({ item }: CartItemProps) => {
     const value = parseInt(e?.target?.value) || 1;
     handleUpdateQuantity(item?.id, value);
   }, [item?.id, handleUpdateQuantity]);
-  // Clear interval when the component unmounts or when intervalId changes
+  // Clear timeout when the component unmounts or when timeoutId changes
   useEffect(() => {
     return () => {
-      if (intervalId) clearTimeout(intervalId);
+      if (timeoutId) clearTimeout(timeoutId);
     };
-  }, [intervalId]);
+  }, [timeoutId]);
 
 
   const startAutoIncrement = useCallback(() => {
-    setIntervalId(setTimeout(function _fn(_id: string, quantity: number, setIntervalId: (id: NodeJS.Timeout | null) => void) {
+    setTimeoutId(setTimeout(function _fn(_id: string, quantity: number, setTimeoutId: (id: NodeJS.Timeout | null) => void) {
       handleUpdateQuantity(_id, quantity);
-      setIntervalId(setTimeout(_fn, 1000, _id, quantity + 1, setIntervalId));
-    }, 1000, item?.id, item?.quantity + 1, setIntervalId));
+      setTimeoutId(setTimeout(_fn, 1000, _id, quantity + 1, setTimeoutId));
+    }, 1000, item?.id, item?.quantity + 1, setTimeoutId));
   }, [handleUpdateQuantity, item?.id, item?.quantity]);
 
   const stopAutoIncrement = useCallback(() => {
-    if (intervalId) {
-      clearTimeout(intervalId);
-      setIntervalId(null);
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      setTimeoutId(null);
     }
-  }, [intervalId]);
+  }, [timeoutId]);
   const toggleAutoIncrement = useCallback(() => {
-    if (intervalId) {
+    if (timeoutId) {
       stopAutoIncrement();
     }
     else {
       startAutoIncrement();
     }
-  }, [intervalId, startAutoIncrement, stopAutoIncrement]);
+  }, [timeoutId, startAutoIncrement, stopAutoIncrement]);
 
   const subtotal = (item?.price * item?.quantity)?.toFixed(2) ?? '0.00';
 
@@ -111,7 +111,7 @@ const CartItem = ({ item }: CartItemProps) => {
             onClick={toggleAutoIncrement}
             className="text-warning"
           >
-            {intervalId ? 'Stop' : 'Start'} Auto +1/sec
+            {timeoutId ? 'Stop' : 'Start'} Auto +1/sec
           </Button>
 
 
