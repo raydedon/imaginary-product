@@ -4,32 +4,39 @@ import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 import { useCart } from '../../../hooks/useCart';
+import type { CartItem } from '../../../contexts/CartProvider';
 
-const CartItem = ({ item }) => {
-  const [_intervalId, _setIntervalId] = useState(null);
+interface CartItemProps {
+  item: CartItem;
+  onUpdateQuantity: (itemId: string, quantity: number) => void;
+  onRemove: (itemId: string) => void;
+}
+
+const CartItem = ({ item, onUpdateQuantity, onRemove }: CartItemProps) => {
+  const [_intervalId, _setIntervalId] = useState<NodeJS.Timeout | null>(null);
 
   const { updateQuantity, removeFromCart } = useCart();
 
-  const handleQuantityChange = useCallback((e) => {
+  const handleQuantityChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e?.target?.value) || 1;
-    updateQuantity(item?.id, value);
+    onUpdateQuantity(item?.id, value);
   }, [updateQuantity, item?.id]);
 
   const startAutoIncrement = useCallback(() => {
     const id = setInterval(() => {
       updateQuantity(item?.id, item?.quantity + 1);
     }, 1000);
-    _setIntervalId(id);
+    _setIntervalId(id as NodeJS.Timeout);
   }, [updateQuantity, item?.id, item?.quantity]);
 
-  const subtotal = (item?.price * item?.quantity)?.toFixed(2);
+  const subtotal = (item?.price * item?.quantity)?.toFixed(2) ?? '0.00';
 
   return (
     <div className="flex flex-col md:flex-row gap-4 md:gap-6 p-4 md:p-6 bg-card border border-border rounded-lg hover:shadow-md transition-shadow duration-250">
       <div className="w-full md:w-32 lg:w-40 h-32 md:h-32 lg:h-40 flex-shrink-0 overflow-hidden rounded-md bg-muted">
         <Image
-          src={item?.images[0]?.url}
-          alt={item?.images[0]?.alt}
+          src={item?.images?.[0]?.url ?? ''}
+          alt={item?.images?.[0]?.alt ?? ''}
           className="w-full h-full object-cover"
         />
       </div>
@@ -37,15 +44,15 @@ const CartItem = ({ item }) => {
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
           <div className="flex-1 min-w-0">
             <h3 className="text-base md:text-lg lg:text-xl font-semibold text-foreground line-clamp-2">
-              {item?.name}
+              {item?.title}
             </h3>
             <p className="text-xs md:text-sm text-muted-foreground mt-1 line-clamp-1">
-              {item?.category}
+              {item?.category?.title ?? ''}
             </p>
           </div>
           <div className="text-right sm:text-left">
             <p className="text-lg md:text-xl lg:text-2xl font-bold text-primary whitespace-nowrap">
-              ${item?.price?.toFixed(2)}
+              ${item?.price?.toFixed(2) ?? '0.00'}
             </p>
             <p className="text-xs md:text-sm text-muted-foreground">per item</p>
           </div>
@@ -61,7 +68,8 @@ const CartItem = ({ item }) => {
               disabled={item?.quantity <= 1}
             />
             <Input
-              type="number"
+              type="text"
+              inputMode="numeric"
               value={item?.quantity}
               onChange={handleQuantityChange}
               className="w-16 md:w-20 text-center"

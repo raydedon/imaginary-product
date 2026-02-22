@@ -4,7 +4,12 @@ import Button from '../../../components/ui/Button';
 import Icon from '../../../components/AppIcon';
 
 const RegisterForm = ({ onSubmit, onSwitchToLogin }) => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    fullName: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+  }>({
     fullName: '',
     email: '',
     password: '',
@@ -12,7 +17,7 @@ const RegisterForm = ({ onSubmit, onSwitchToLogin }) => {
   });
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const passwordStrength = useMemo(() => {
     return formData?.password?.length;
@@ -25,13 +30,13 @@ const RegisterForm = ({ onSubmit, onSwitchToLogin }) => {
   }, [passwordStrength]);
 
   useEffect(() => {
-    const handlePaste = (e) => {
-      if (e?.target?.type === 'password') {
+    const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+      if ((e?.target as HTMLInputElement)?.type === 'password') {
         e?.preventDefault();
       }
     };
     
-    document.addEventListener('paste', handlePaste);
+    document.addEventListener('paste', handlePaste as unknown as EventListener);
   }, []);
 
   useEffect(() => {
@@ -40,8 +45,8 @@ const RegisterForm = ({ onSubmit, onSwitchToLogin }) => {
     }, 3000);
   }, []);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e?.target;
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e?.target as HTMLInputElement;
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -49,7 +54,7 @@ const RegisterForm = ({ onSubmit, onSwitchToLogin }) => {
     
     if (errors?.[name]) {
       setErrors(prev => {
-        const newErrors = { ...prev };
+        const newErrors: Record<string, string> = { ...prev };
         delete newErrors?.[name];
         return newErrors;
       });
@@ -57,7 +62,7 @@ const RegisterForm = ({ onSubmit, onSwitchToLogin }) => {
   };
 
   const validateForm = () => {
-    const newErrors = {};
+    const newErrors: Record<string, string> = {};
     
     if (!formData?.fullName?.trim()) {
       newErrors.fullName = 'Full name is required';
@@ -92,7 +97,7 @@ const RegisterForm = ({ onSubmit, onSwitchToLogin }) => {
     return newErrors;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e?.preventDefault();
     
     const validationErrors = validateForm();
@@ -119,13 +124,13 @@ const RegisterForm = ({ onSubmit, onSwitchToLogin }) => {
     }, 2000);
   };
 
-  const getStrengthColor = () => {
+  const getStrengthColor = (): string => {
     if (passwordStrength < 6) return 'bg-error';
     if (passwordStrength < 10) return 'bg-warning';
     return 'bg-success';
   };
 
-  const getStrengthWidth = () => {
+  const getStrengthWidth = (): string => {
     if (passwordStrength < 6) return 'w-1/3';
     if (passwordStrength < 10) return 'w-2/3';
     return 'w-full';
@@ -136,33 +141,31 @@ const RegisterForm = ({ onSubmit, onSwitchToLogin }) => {
       <div>
         <Input
           type="text"
-          name="fullName"
+          id="fullName"
           label="Full Name"
           placeholder="Enter your full name"
           value={formData?.fullName}
           onChange={handleInputChange}
           error={errors?.fullName}
           required
-          className="mb-4"
         />
       </div>
       <div>
         <Input
-          type="email"
-          name="email"
+          type="email"  
+          id="email"
           label="Email Address"
           placeholder="Enter your email"
           value={formData?.email}
           onChange={handleInputChange}
           error={errors?.email}
           required
-          className="mb-4"
         />
       </div>
       <div>
         <Input
           type="password"
-          name="password"
+          id="password"
           label="Password"
           placeholder="Create a strong password"
           value={formData?.password}
@@ -193,7 +196,7 @@ const RegisterForm = ({ onSubmit, onSwitchToLogin }) => {
       <div>
         <Input
           type="password"
-          name="confirmPassword"
+          id="confirmPassword"
           label="Confirm Password"
           placeholder="Re-enter your password"
           value={formData?.confirmPassword}
@@ -207,7 +210,7 @@ const RegisterForm = ({ onSubmit, onSwitchToLogin }) => {
           <input
             type="checkbox"
             checked={acceptTerms}
-            onChange={(e) => setAcceptTerms(e?.target?.checked)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAcceptTerms(e?.target?.checked)}
             className="w-4 h-4 mt-0.5 rounded border-border bg-input text-primary focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background flex-shrink-0"
           />
           <span className="text-sm text-foreground">

@@ -1,11 +1,32 @@
 // components/ui/Select.jsx - Shadcn style Select
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, ChangeEventHandler } from "react";
 import { ChevronDown, Check, Search, X } from "lucide-react";
 import { cn } from "../../utils/cn";
 import Button from "./Button";
 import Input from "./Input";
 
-const Select = React.forwardRef(({
+interface SelectProps {
+    className?: string;
+    options?: Array<{ label: string; value: string; description?: string; disabled?: boolean }>;
+    value?: string | string[];
+    defaultValue?: string | string[];
+    placeholder?: string;
+    multiple?: boolean;
+    disabled?: boolean;
+    required?: boolean;
+    label?: string;
+    description?: string;
+    error?: string;
+    searchable?: boolean;
+    clearable?: boolean;
+    loading?: boolean;
+    id?: string;
+    name?: string;
+    onChange?: (value: string | string[]) => void;
+    onOpenChange?: (open: boolean) => void;
+}
+
+const Select = React.forwardRef<HTMLSelectElement, SelectProps>(({
     className,
     options = [],
     value,
@@ -69,7 +90,7 @@ const Select = React.forwardRef(({
 
     const handleOptionSelect = (option) => {
         if (multiple) {
-            const newValue = value || [];
+            const newValue = value ? (Array.isArray(value) ? value : [value]) : [];
             const updatedValue = newValue?.includes(option?.value)
                 ? newValue?.filter(v => v !== option?.value)
                 : [...newValue, option?.value];
@@ -146,7 +167,7 @@ const Select = React.forwardRef(({
             )}
             <div className="relative">
                 <button
-                    ref={ref}
+                    ref={ref as unknown as React.RefObject<HTMLButtonElement>}
                     id={selectId}
                     type="button"
                     className={cn(
@@ -154,7 +175,7 @@ const Select = React.forwardRef(({
                         error && "border-destructive focus:ring-destructive",
                         !hasValue && "text-muted-foreground"
                     )}
-                    onClick={handleToggle}
+                    onClick={handleToggle as unknown as React.MouseEventHandler<HTMLButtonElement>}
                     disabled={disabled}
                     aria-expanded={isOpen}
                     aria-haspopup="listbox"

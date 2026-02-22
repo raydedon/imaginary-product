@@ -4,7 +4,20 @@ import Input from '../../../components/ui/Input';
 import Button from '../../../components/ui/Button';
 import Icon from '../../../components/AppIcon';
 
-const FilterToolbar = ({ onFilterChange, categories, totalProducts }) => {
+interface Filters {
+  search: string;
+  category: string;
+  minPrice: number | null;
+  maxPrice: number | null;
+}
+
+interface FilterToolbarProps {
+  onFilterChange: (filters: Filters) => void;
+  categories: Array<{ slug: string; name: string }>;
+  totalProducts: number;
+}
+
+const FilterToolbar = ({ onFilterChange, categories, totalProducts }: FilterToolbarProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [minPrice, setMinPrice] = useState('');
@@ -29,7 +42,7 @@ const FilterToolbar = ({ onFilterChange, categories, totalProducts }) => {
 
   const categoryOptions = useMemo(() => [
     { value: 'all', label: 'All Categories' },
-    ...categories?.map(cat => ({ value: cat.slug, label: cat?.name }))
+    ...categories?.map((category) => ({ value: category?.slug, label: category?.name }))
   ], [categories]);
 
   return (
@@ -51,7 +64,7 @@ const FilterToolbar = ({ onFilterChange, categories, totalProducts }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="lg:col-span-2">
             <Input
-              type="search"
+              type="text"
               label="Search Products"
               placeholder="Search by name..."
               value={searchTerm}
@@ -63,12 +76,12 @@ const FilterToolbar = ({ onFilterChange, categories, totalProducts }) => {
           label="Category"
           options={categoryOptions}
           value={selectedCategory}
-          onChange={setSelectedCategory}
+          onChange={(value: string) => setSelectedCategory(value)}
         />
 
         <div className="flex gap-2">
           <Input
-            type="number"
+            type="text"
             label="Min Price"
             placeholder="$0"
             value={minPrice}
@@ -76,7 +89,7 @@ const FilterToolbar = ({ onFilterChange, categories, totalProducts }) => {
             className="flex-1"
           />
           <Input
-            type="number"
+            type="text"
             label="Max Price"
             placeholder="$999"
             value={maxPrice}

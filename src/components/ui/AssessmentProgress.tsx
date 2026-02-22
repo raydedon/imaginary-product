@@ -1,17 +1,22 @@
 import React, { createContext, useContext, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
-const AssessmentProgressContext = createContext();
+interface AssessmentProgressContextType {
+  progress: Record<string, { identified: number; resolved: number; total: number }>;
+  markProblemIdentified: (path: string, _problemId: string) => void;
+  markProblemResolved: (path: string, _problemId: string) => void;
+  getProgressPercentage: (path: string) => number;
+}
 
-export const useAssessmentProgress = () => {
+const AssessmentProgressContext = createContext<AssessmentProgressContextType | undefined>(undefined);
+
+export const useAssessmentProgress = (): AssessmentProgressContextType => {
   const context = useContext(AssessmentProgressContext);
-  if (!context) {
-    throw new Error('useAssessmentProgress must be used within AssessmentProgressProvider');
-  }
+  if (!context) throw new Error('useAssessmentProgress must be used within AssessmentProgressProvider');
   return context;
 };
 
-export const AssessmentProgressProvider = ({ children }) => {
+export const AssessmentProgressProvider = ({ children }: { children: React.ReactNode }) => {
   const [progress, setProgress] = useState({
     '/product-assessment-dashboard': { identified: 0, resolved: 0, total: 8 },
     '/product-detail-view': { identified: 0, resolved: 0, total: 6 },

@@ -15,16 +15,16 @@ const ProductAssessmentDashboard = () => {
     minPrice: null,
     maxPrice: null
   });
-  const { products, categories, setProductCount, productCount, setSelectedProductId: _setSelectedProductId } = useCart();
+  const { products, categories, setProductCount, productCount } = useCart();
 
   const filteredProducts = useMemo(() => {
     return products?.filter(product => {
       const matchesSearch = product?.title?.toLowerCase()?.includes(filters?.search?.toLowerCase());
-      const matchesCategory = filters?.category === 'all' || product?.category === filters?.category;
+      const matchesCategory = filters?.category === 'all' || product?.category?.slug === filters?.category;
       const matchesMinPrice = filters?.minPrice === null || product?.price >= filters?.minPrice;
       const matchesMaxPrice = filters?.maxPrice === null || product?.price <= filters?.maxPrice;
 
-      return matchesSearch && matchesCategory && matchesMinPrice && matchesMaxPrice;
+      return matchesSearch && matchesCategory && matchesMinPrice && matchesMaxPrice && matchesCategory;
     });
   }, [products, filters]);
 
@@ -70,7 +70,10 @@ const ProductAssessmentDashboard = () => {
 
           <FilterToolbar
             onFilterChange={setFilters}
-            categories={categories}
+            categories={categories?.map((category) => ({
+              slug: category?.slug,
+              name: category?.title
+            }))}
             totalProducts={products?.length}
           />
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import Header from '../../components/ui/Header';
@@ -14,6 +14,7 @@ import CustomerReviews from './components/CustomerReviews';
 import Icon from '../../components/AppIcon';
 import { useCart } from '../../hooks/useCart';
 import { fetchPexelsImages } from '../../utils/utils';
+import type { ProductItem } from '../../contexts/CartProvider';
 
 
 const ProductDetailView = () => {
@@ -22,7 +23,7 @@ const ProductDetailView = () => {
   const numericProductId = Number(productId);
   const hasValidProductId = Number.isFinite(numericProductId) && numericProductId > 0;
   const { products, isProductsLoading } = useCart();
-  const [product, setProduct] = useState(null);
+  const [product, setProduct] = useState<ProductItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
 
@@ -52,7 +53,6 @@ const ProductDetailView = () => {
         // Mock product data
         const mockProduct = {
           id: 1,
-          name: "Premium Wireless Earbuds Pro",
           title: "Premium Wireless Earbuds Pro",
           sku: "WEP-2024-001",
           description: `Experience superior audio quality with our Premium Wireless Earbuds Pro. Featuring advanced noise cancellation technology, these earbuds deliver crystal-clear sound whether you're commuting, working out, or relaxing at home. The ergonomic design ensures all-day comfort, while the long-lasting battery provides up to 8 hours of continuous playback on a single charge.\n\nWith IPX7 water resistance, these earbuds can withstand sweat and light rain, making them perfect for active lifestyles. The intuitive touch controls allow you to manage calls, adjust volume, and control playback without reaching for your device.`,
@@ -113,7 +113,7 @@ const ProductDetailView = () => {
           }
         };
         // Fetch images from Pexels based on product name/category
-        const pexelsImages = await fetchPexelsImages(selectedProduct?.title ?? selectedProduct?.name, 5);
+        const pexelsImages = await fetchPexelsImages(selectedProduct?.title ?? selectedProduct?.title, 5);
 
         // Merge Pexels images with mock product
         const productWithImages = {
@@ -129,7 +129,7 @@ const ProductDetailView = () => {
         }
 
         if (isMounted) {
-          setProduct(productWithImages);
+          setProduct(productWithImages as ProductItem);
         }
       } catch (error) {
         console.error('Error loading product:', error);
@@ -198,14 +198,14 @@ const ProductDetailView = () => {
               Dashboard
             </button>
             <Icon name="ChevronRight" size={16} color="var(--color-muted-foreground)" />
-            <span className="text-foreground font-medium truncate">{product?.name}</span>
+            <span className="text-foreground font-medium truncate">{product?.title}</span>
           </nav>
 
           {/* Main Product Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 lg:gap-12 mb-8 md:mb-12">
             {/* Left Column - Images */}
             <div>
-              <ProductImageGallery images={product?.images} productName={product?.name} />
+              <ProductImageGallery images={product?.images ?? []} />
             </div>
 
             {/* Right Column - Info & Configuration */}
@@ -250,21 +250,21 @@ const ProductDetailView = () => {
               }
 
               {activeTab === 'specifications' &&
-              <ProductSpecifications specifications={product?.specifications} />
+              <ProductSpecifications specifications={product?.specifications ?? {}} />
               }
 
               {activeTab === 'reviews' &&
               <CustomerReviews
                 productId={numericProductId}
-                averageRating={product?.rating}
-                totalReviews={product?.reviewCount} />
+                averageRating={product?.rating ?? 0}
+                totalReviews={product?.reviewCount ?? 0} />
 
               }
             </div>
           </div>
 
           {/* Related Products */}
-          <RelatedProducts currentProductId={numericProductId} category={product?.category} />
+          <RelatedProducts currentProductId={numericProductId} category={product?.category ?? null} />
         </div>
       </div>
     </div>);

@@ -1,6 +1,10 @@
 import React from 'react';
 
-const ProductSpecifications = ({ specifications }) => {
+interface ProductSpecificationsProps {
+  specifications: Record<string, string>;
+}
+
+const ProductSpecifications = ({ specifications }: ProductSpecificationsProps) => {
   return (
     <div className="bg-card border border-border rounded-lg p-4 md:p-6">
       <h2 className="text-xl md:text-2xl font-semibold text-foreground mb-4 md:mb-6">
@@ -16,7 +20,7 @@ const ProductSpecifications = ({ specifications }) => {
               {key}
             </span>
             <span className="text-sm md:text-base text-foreground font-mono">
-              {value}
+              {value as string}
             </span>
           </div>
         ))}

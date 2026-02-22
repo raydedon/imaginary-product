@@ -13,11 +13,11 @@ class ErrorBoundary extends React.Component {
 
   componentDidCatch(error, errorInfo) {
     error.__ErrorBoundary = true;
-    window.__COMPONENT_ERROR__?.(error, errorInfo);
+    (window as any).__COMPONENT_ERROR__?.(error, errorInfo);
   }
 
   render() {
-    if (this.state?.hasError) {
+    if ((this.state as any)?.hasError) {
       return (
         <div className="min-h-screen flex items-center justify-center bg-neutral-50">
           <div className="text-center p-8 max-w-md">
@@ -49,7 +49,7 @@ class ErrorBoundary extends React.Component {
       );
     }
 
-    return this.props?.children;
+    return (this.props as any)?.children;
   }
 }
 

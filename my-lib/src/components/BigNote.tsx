@@ -1,6 +1,6 @@
 import React from "react";
 
-const content = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis purus turpis, pharetra eu placerat non, maximus ut mi. Vivamus lacus elit, finibus at tempor a, gravida vitae massa. Cras consequat eu urna et dapibus. Etiam auctor facilisis nunc, ac egestas orci euismod vitae. Donec in vehicula leo. Cras iaculis, sem eget rutrum maximus, eros quam lacinia leo, vitae convallis ipsum ipsum et arcu. Duis risus augue, ornare at ligula eget, mollis vehicula tellus. Sed vitae nibh metus. Morbi augue nisl, vulputate id tincidunt eu, pretium ac ipsum. Vivamus est lorem, ultrices non efficitur in, malesuada et ligula. In hac habitasse platea dictumst.
+const CONTENT_DEFAULT = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis purus turpis, pharetra eu placerat non, maximus ut mi. Vivamus lacus elit, finibus at tempor a, gravida vitae massa. Cras consequat eu urna et dapibus. Etiam auctor facilisis nunc, ac egestas orci euismod vitae. Donec in vehicula leo. Cras iaculis, sem eget rutrum maximus, eros quam lacinia leo, vitae convallis ipsum ipsum et arcu. Duis risus augue, ornare at ligula eget, mollis vehicula tellus. Sed vitae nibh metus. Morbi augue nisl, vulputate id tincidunt eu, pretium ac ipsum. Vivamus est lorem, ultrices non efficitur in, malesuada et ligula. In hac habitasse platea dictumst.
 
 In ligula massa, commodo et odio faucibus, consectetur tristique ipsum. Integer sollicitudin eget purus et facilisis. Nam nec ante id est faucibus euismod. Donec iaculis sapien eu sem congue, id hendrerit leo consectetur. Nullam feugiat condimentum augue, eget luctus eros sollicitudin eget. Fusce id arcu sit amet nisl gravida lobortis eget viverra massa. Aenean id gravida arcu, eu dictum velit. Ut tristique felis nisl, blandit vulputate sapien commodo pharetra. Etiam pretium a dui ac laoreet.
 
@@ -304,9 +304,10 @@ Mauris vitae odio a dui suscipit sodales vel scelerisque nisl. Nulla imperdiet i
 
 interface BigNoteProps {
   title?: string;
+  content?: string;
 }
 
-const BigNote: React.FC<BigNoteProps> = ({ title = "Big Note" }) => {
+const BigNote: React.FC<BigNoteProps> = ({ title = "Big Note", content = CONTENT_DEFAULT }) => {
   return (
     <div className="max-w-sm mx-auto bg-yellow-100 border-l-4 border-yellow-500 p-4 rounded shadow-md mt-4">
       <h2 className="text-lg font-bold text-yellow-800">{title}</h2>

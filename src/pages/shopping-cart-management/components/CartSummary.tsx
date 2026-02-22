@@ -3,36 +3,48 @@ import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 
+interface CartSummaryProps {
+  subtotal: number;
+  tax: number;
+  shipping: number;
+  discount: number;
+  total: number;
+  couponCode: string;
+  itemCount: number;
+  onCouponChange: (couponCode: string) => void;
+  onApplyCoupon: () => void;
+  onCheckout: () => void;
+}
 const CartSummary = React.memo(({ 
   subtotal, 
   tax, 
-  shipping, 
-  discount, 
+  shipping,
+  discount,
   total,
   couponCode,
+  itemCount,
   onCouponChange,
   onApplyCoupon,
   onCheckout,
-  itemCount
-}) => {
+}: CartSummaryProps) => {
   const formattedSubtotal = useMemo(() => {
-    return subtotal?.toFixed(2);
+    return subtotal?.toFixed(2) ?? '0.00';
   }, [subtotal]);
 
   const formattedTax = useMemo(() => {
-    return tax?.toFixed(2);
+    return tax?.toFixed(2) ?? '0.00';
   }, [tax]);
 
   const formattedShipping = useMemo(() => {
-    return shipping?.toFixed(2);
+    return shipping?.toFixed(2) ?? '0.00';
   }, [shipping]);
 
   const formattedDiscount = useMemo(() => {
-    return discount?.toFixed(2);
+    return discount?.toFixed(2) ?? '0.00';
   }, [discount]);
 
   const formattedTotal = useMemo(() => {
-    return total?.toFixed(2);
+    return total?.toFixed(2) ?? '0.00';
   }, [total]);
 
   return (

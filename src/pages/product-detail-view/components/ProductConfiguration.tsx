@@ -3,7 +3,13 @@ import Button from '../../../components/ui/Button';
 import Icon from '../../../components/AppIcon';
 import { useCart } from '../../../hooks/useCart';
 import { useNavigate } from 'react-router-dom';
-const ProductConfiguration = ({ product }) => {
+import type { ProductItem } from '../../../contexts/CartProvider';
+
+interface ProductConfigurationProps {
+  product: ProductItem;
+}
+
+const ProductConfiguration = ({ product }: ProductConfigurationProps) => {
   const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
   const [selectedColor, setSelectedColor] = useState(product?.colors?.[0]);

@@ -1,16 +1,26 @@
 import React from "react";
 import { cn } from "../../utils/cn";
 
-const Input = React.forwardRef(({
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+    className?: string;
+    label?: string;
+    description?: string;
+    error?: string;
+    required?: boolean;
+    id?: string;
+    type?: "text" | "email" | "password" | "checkbox" | "radio";
+}
+
+const Input = React.forwardRef<HTMLInputElement, InputProps>(({
     className,
-    type = "text",
     label,
     description,
     error,
     required = false,
     id,
+    type = "text",
     ...props
-}, ref) => {
+}, ref: React.Ref<HTMLInputElement>) => {
     // Generate unique ID if not provided
     const inputId = id || `input-${Math.random()?.toString(36)?.substr(2, 9)}`;
 

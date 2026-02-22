@@ -35,21 +35,20 @@ const buttonVariants = cva(
     }
 );
 
-const Button = React.forwardRef(({
-    className,
-    variant,
-    size,
-    asChild = false,
-    children,
-    loading = false,
-    iconName = null,
-    iconPosition = 'left',
-    iconSize = null,
-    fullWidth = false,
-    disabled = false,
-    ...props
-}, ref) => {
-    const Comp = asChild ? Slot : "button";
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+    variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "success" | "warning" | "danger";
+    size?: "default" | "sm" | "lg" | "icon" | "xs" | "xl";
+    asChild?: boolean;
+    children?: React.ReactNode;
+    loading?: boolean;
+    iconName?: string;
+    iconPosition?: "left" | "right";
+    iconSize?: number;
+    fullWidth?: boolean;
+}
+
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ className, variant, size, asChild = false, children, loading = false, iconName = null, iconPosition = 'left', iconSize = null, fullWidth = false, disabled = false, ...props }, ref: React.Ref<HTMLButtonElement>) => {
+    const Comp = asChild ? Slot : "button" as React.ElementType;
 
     // Icon size mapping based on button size
     const iconSizeMap = {

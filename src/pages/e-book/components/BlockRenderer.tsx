@@ -1,15 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Icon from '../../../components/AppIcon';
+import { BlockItem } from '../index';
 
-const BlockRenderer = ({ block, onEdit: _onEdit, isEditing: _isEditing }) => {
-  const [_localContent, _setLocalContent] = useState(block?.content);
+interface BlockRendererProps {
+  block: BlockItem;
+  onEdit: (block: BlockItem) => void;
+  isEditing: boolean;
+}
+
+const BlockRenderer = ({block, onEdit, isEditing}: BlockRendererProps): React.ReactNode => {
   const [hovered, setHovered] = useState(false);
 
-  useEffect(() => {
-    setLocalContent(block?.content);
-  }, [block?.content]);
-
-  const processContent = (content) => {
+  const processContent = (content: string): string => {
     let processed = content;
     for (let i = 0; i < 1000; i++) {
       processed = processed?.toString();
@@ -17,7 +19,7 @@ const BlockRenderer = ({ block, onEdit: _onEdit, isEditing: _isEditing }) => {
     return processed;
   };
 
-  const renderBlockContent = () => {
+  const renderBlockContent = (): React.ReactNode => {
     switch (block?.type) {
       case 'heading1':
         return (
@@ -96,7 +98,7 @@ const BlockRenderer = ({ block, onEdit: _onEdit, isEditing: _isEditing }) => {
       case 'list':
         return (
           <ul className="list-disc list-inside space-y-2 my-4 text-foreground">
-            {block?.items?.map((item, idx) => (
+            {block?.items?.map((item: string, idx: number) => (
               (<li key={idx} className="leading-relaxed">
                 {processContent(item)}
               </li>)
@@ -107,7 +109,7 @@ const BlockRenderer = ({ block, onEdit: _onEdit, isEditing: _isEditing }) => {
       case 'numbered-list':
         return (
           <ol className="list-decimal list-inside space-y-2 my-4 text-foreground">
-            {block?.items?.map((item, idx) => (
+            {block?.items?.map((item: string, idx: number) => (
               (<li key={idx} className="leading-relaxed">
                 {processContent(item)}
               </li>)
@@ -122,7 +124,7 @@ const BlockRenderer = ({ block, onEdit: _onEdit, isEditing: _isEditing }) => {
         return (
           <button
             className="bg-primary text-primary-foreground px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors my-4"
-            onClick={block?.onClick}
+            onClick={block?.onClick as unknown as React.MouseEventHandler<HTMLButtonElement>}
           >
             {block?.content}
           </button>
@@ -134,19 +136,19 @@ const BlockRenderer = ({ block, onEdit: _onEdit, isEditing: _isEditing }) => {
             <table className="w-full border-collapse border border-border">
               <thead>
                 <tr className="bg-muted">
-                  {block?.headers?.map((header, idx) => (
+                  {block?.headers?.map((header: string, idx: number) => (
                     (<th key={idx} className="border border-border px-4 py-2 text-left font-semibold text-foreground">
-                      {header}
+                      {header || ''}
                     </th>)
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {block?.rows?.map((row, rowIdx) => (
+                {block?.rows?.map((row: string[], rowIdx: number) => (
                   (<tr key={rowIdx} className="hover:bg-muted/50">
-                    {row?.map((cell, cellIdx) => (
+                    {row?.map((cell: string, cellIdx: number) => (
                       <td key={cellIdx} className="border border-border px-4 py-2 text-foreground">
-                        {cell}
+                        {cell || ''}
                       </td>
                     ))}
                   </tr>)

@@ -2,7 +2,20 @@ import React from "react";
 import { Check, Minus } from "lucide-react";
 import { cn } from "../../utils/cn";
 
-const Checkbox = React.forwardRef(({
+interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
+    className?: string;
+    id?: string;
+    checked?: boolean;
+    indeterminate?: boolean;
+    disabled?: boolean;
+    required?: boolean;
+    label?: string;
+    description?: string;
+    error?: string;
+    size?: "sm" | "default" | "lg" | "icon" | "xs" | "xl";
+}
+
+const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(({
     className,
     id,
     checked,
@@ -12,18 +25,10 @@ const Checkbox = React.forwardRef(({
     label,
     description,
     error,
-    size = "default",
+    size = "icon",
     ...props
-}, ref) => {
-    // Generate unique ID if not provided
+}, ref: React.Ref<HTMLInputElement>) => {
     const checkboxId = id || `checkbox-${Math.random()?.toString(36)?.substr(2, 9)}`;
-
-    // Size variants
-    const sizeClasses = {
-        sm: "h-4 w-4",
-        default: "h-4 w-4",
-        lg: "h-5 w-5"
-    };
 
     return (
         <div className={cn("flex items-start space-x-2", className)}>
@@ -43,7 +48,7 @@ const Checkbox = React.forwardRef(({
                     htmlFor={checkboxId}
                     className={cn(
                         "peer shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground cursor-pointer transition-colors",
-                        sizeClasses?.[size],
+                        size === "sm" ? "h-3 w-3" : size === "lg" ? "h-4 w-4" : "h-4 w-4",
                         checked && "bg-primary text-primary-foreground border-primary",
                         indeterminate && "bg-primary text-primary-foreground border-primary",
                         error && "border-destructive",
@@ -93,7 +98,18 @@ const Checkbox = React.forwardRef(({
 Checkbox.displayName = "Checkbox";
 
 // Checkbox Group component
-const CheckboxGroup = React.forwardRef(({
+interface CheckboxGroupProps extends React.FieldsetHTMLAttributes<HTMLFieldSetElement> {
+    className?: string;
+    children?: React.ReactNode;
+    label?: string;
+    description?: string;
+    error?: string;
+    required?: boolean;
+    disabled?: boolean;
+    size?: "sm" | "default" | "lg";
+}
+
+const CheckboxGroup = React.forwardRef<HTMLFieldSetElement, CheckboxGroupProps>(({
     className,
     children,
     label,

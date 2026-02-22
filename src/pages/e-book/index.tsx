@@ -5,8 +5,21 @@ import Icon from '../../components/AppIcon';
 import BlockRenderer from './components/BlockRenderer';
 import { generateLargeBlockData } from './components/blockData';
 
+export interface BlockItem {
+  id: string;
+  type: string;
+  content: string;
+  items: string[];
+  rows: string[][];
+  headers: string[];
+  alt?: string;
+  caption?: string;
+  language?: string;
+  author?: string;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
+}
 const Ebook = () => {
-  const [blocks, setBlocks] = useState([]);
+  const [blocks, setBlocks] = useState<Array<BlockItem>>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [draggedBlock, setDraggedBlock] = useState(null);
   const [editingBlock, setEditingBlock] = useState(null);
@@ -53,22 +66,22 @@ const Ebook = () => {
     setBlocks([...blocks]);
   }, [blocks]);
 
-  const handleDrop = useCallback((e, _targetId) => {
+  const handleDrop = useCallback((e, _targetId: string) => {
     e?.preventDefault();
-    if (!draggedBlock || draggedBlock === targetId) return;
+    if (!draggedBlock || draggedBlock === _targetId) return;
 
     const draggedIndex = blocks?.findIndex(b => b?.id === draggedBlock);
-    const targetIndex = blocks?.findIndex(b => b?.id === targetId);
+    const targetIndex = blocks?.findIndex(b => b?.id === _targetId);
     
     const newBlocks = [...blocks];
     const [removed] = newBlocks?.splice(draggedIndex, 1);
     newBlocks?.splice(targetIndex, 0, removed);
     
     setBlocks([...newBlocks]);
-    setDraggedBlock(null);
+    setDraggedBlock(null as unknown as string);
   }, [draggedBlock, blocks]);
 
-  const handleBlockEdit = useCallback((blockId, newContent) => {
+  const handleBlockEdit = useCallback((blockId: string, newContent: string) => {
     setEditingBlock(blockId);
     setBlocks(blocks?.map(block => {
       if (block?.id === blockId) {
@@ -138,7 +151,7 @@ const Ebook = () => {
               >
                 <BlockRenderer
                   block={block}
-                  onEdit={(content) => handleBlockEdit(block?.id, content)}
+                  onEdit={(block: BlockItem) => handleBlockEdit(block?.id, block?.content)}
                   isEditing={editingBlock === block?.id}
                   key={block?.id}
                 />

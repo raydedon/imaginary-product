@@ -3,31 +3,17 @@ import Input from '../../../components/ui/Input';
 import Button from '../../../components/ui/Button';
 import Icon from '../../../components/AppIcon';
 
-const LoginForm = ({ onSubmit, onSwitchToRegister }) => {
+interface LoginFormProps {
+  onSubmit: (email: string, rememberMe: boolean) => void;
+  onSwitchToRegister: () => void;
+}
+
+const LoginForm = ({ onSubmit = () => {}, onSwitchToRegister = () => {} }: LoginFormProps) => {
   const [email, setEmail] = useState('demo@reactarchitect.com');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState({});
-
-  useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      if (e?.key === 'Enter' && email && password) {
-        handleSubmit(e);
-      }
-    };
-    
-    window.addEventListener('keypress', handleKeyPress);
-    return () => window.removeEventListener('keypress', handleKeyPress);
-  }, [email, password, handleSubmit]);
-
-  useEffect(() => {
-    if (Object.keys(errors)?.length > 0) {
-      setTimeout(() => {
-        setErrors({});
-      }, 5000);
-    }
-  }, [errors]);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validateForm = useCallback((): Record<string, string> => {
     const newErrors: Record<string, string> = {};
@@ -47,10 +33,10 @@ const LoginForm = ({ onSubmit, onSwitchToRegister }) => {
     return newErrors;
   }, [email, password]);
 
-  const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement> | KeyboardEvent) => {
     e?.preventDefault();
     
-    const validationErrors = validateForm(email, password);
+    const validationErrors = validateForm();
     if (Object.keys(validationErrors)?.length > 0) {
       setErrors(validationErrors);
       return;
@@ -61,7 +47,7 @@ const LoginForm = ({ onSubmit, onSwitchToRegister }) => {
 
     setTimeout(() => {
       if (email === 'demo@reactarchitect.com' && password === 'React2026!') {
-        onSubmit({ email, rememberMe });
+        onSubmit(email as string, rememberMe);
       } else {
         setErrors({ 
           submit: 'Authentication failed. Invalid credentials provided.' 
@@ -70,6 +56,27 @@ const LoginForm = ({ onSubmit, onSwitchToRegister }) => {
       setIsLoading(false);
     }, 1500);
   }, [email, password, onSubmit, setIsLoading, setErrors, validateForm, rememberMe]);
+
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e?.key === 'Enter' && email && password) {
+        handleSubmit(e as unknown as React.FormEvent<HTMLFormElement>);
+      }
+    };
+    
+    window.addEventListener('keypress', handleKeyPress);
+    return () => window.removeEventListener('keypress', handleKeyPress);
+  }, [email, password, handleSubmit]);
+
+  useEffect(() => {
+    if (Object.keys(errors)?.length > 0) {
+      setTimeout(() => {
+        setErrors({});
+      }, 5000);
+    }
+  }, [errors]);
+
+
 
   const emailValue = email === undefined ? '' : email;
 
@@ -82,7 +89,7 @@ const LoginForm = ({ onSubmit, onSwitchToRegister }) => {
           placeholder="Enter your email"
           value={emailValue}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e?.target?.value)}
-          error={errors?.email}
+          error={errors?.email as string | undefined}
           required
           className="mb-4"
         />

@@ -1,11 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
-const FloatigBoxDemo = () => {
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
+interface FloatigBoxDemoProps {
+  onRandomQuote?: () => void;
+}
+
+const FloatigBoxDemo = ({ onRandomQuote }: FloatigBoxDemoProps) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const [showModal, setShowModal] = useState(false);
+
+  const handleRandomQuote = useCallback(() => {
+    onRandomQuote?.();
+  }, [onRandomQuote]);
 
   return (
     <div className="bg-card border border-border rounded-lg p-4 md:p-6">
@@ -99,8 +110,8 @@ const FloatigBoxDemo = () => {
 
         <div>
           <Button
-            onClick={() => setShowModal(!showModal)}
-            variant="primary"
+            onClick={handleRandomQuote}
+            variant="outline"
             size="sm"
           >
             Random Quote
@@ -113,7 +124,7 @@ const FloatigBoxDemo = () => {
             >
               <div 
                 className="bg-card border border-border rounded-lg p-6 max-w-md"
-                onClick={(_e) => alert('Modal content clicked!')}
+                onClick={handleRandomQuote}
               >
                 <h4 className="text-lg font-semibold text-foreground mb-2">Random Quote</h4>
                 <p className="text-sm text-muted-foreground mb-4">

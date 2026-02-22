@@ -1,21 +1,97 @@
-import React, { createContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchCategories, fetchProducts } from '../utils/utils';
 
-export const CartContext = createContext(null);
+export interface CartContextState {
+  cartItems: Array<CartItem>;
+  isLoading: boolean;
+  appliedCoupon: string | null;
+  couponCode: string;
+  isCheckoutOpen: boolean;
+  productCount: number;
+  categories: Array<CategoryItem>;
+  products: Array<ProductItem>;
+  isCategoriesLoading: boolean;
+  isProductsLoading: boolean;
+  categoriesError: Error | null;
+  productsError: Error | null;
+  refetchCategories: () => void;
+  refetchProducts: () => void;
+  addToCart: (product: ProductItem, quantity: number) => void;
+  removeFromCart: (productId: string) => void;
+  updateQuantity: (productId: string, quantity: number) => void;
+  incrementQuantity: (productId: string) => void;
+  decrementQuantity: (productId: string) => void;
+  clearCart: () => void;
+  isInCart: (productId: string) => boolean;
+  getItemQuantity: (productId: string) => number;
+  getCartTotal: () => number;
+  getCartCount: () => number;
+  getCartItemsCount: () => number;
+  getTax: () => number;
+  getShipping: () => number;
+  getGrandTotal: () => number;
+  calculateSubtotal: () => number;
+  calculateTax: () => number;
+  calculateShipping: () => number;
+  calculateDiscount: () => number;
+  calculateTotal: () => number;
+  handleUpdateQuantity: (itemId: string, newQuantity: number) => void;
+  handleRemoveItem: (itemId: string) => void;
+  handleApplyCoupon: () => void;
+  setCouponCode: (code: string) => void;
+  setIsCheckoutOpen: (open: boolean) => void;
+  setProductCount: (count: number) => void;
+}
 
-// Move CartProvider to separate file to fix fast-refresh warning
-export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState([]);
+export const CartContext = createContext<CartContextState | null>(null);
+
+export interface CartItem {
+  id: string;
+  title: string;
+  description?: string;
+  image?: string;
+  price: number;
+  quantity: number;
+  images?: Array<{ url: string; alt: string }>;
+  category?: CategoryItem;
+}
+
+export interface ProductItem {
+  id: string;
+  title: string;
+  description?: string;
+  image?: string;
+  price: number;
+  stock: number;
+  category?: CategoryItem;
+  colors?: Array<string>;
+  sizes?: Array<string>;
+  inStock?: boolean;
+  rating?: number;
+  reviewCount?: number;
+  specifications?: Record<string, string>;
+  images?: Array<{ url: string; alt: string }>;
+}
+
+export interface CategoryItem {
+  id: string;
+  title: string;
+  description?: string;
+  slug: string;
+}
+
+export const CartProvider = ({ children }: { children: React.ReactNode }) => {
+  const [cartItems, setCartItems] = useState<Array<CartItem>>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
   const [couponCode, setCouponCode] = useState('');
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [productCount, setProductCount] = useState(50);
 
   // Fetch categories using React Query
   const {
-    data: categories = [],
+    data: categories = [] as Array<CategoryItem>,
     isLoading: isCategoriesLoading,
     error: categoriesError,
     refetch: refetchCategories
@@ -23,14 +99,13 @@ export const CartProvider = ({ children }) => {
     queryKey: ['categories'],
     queryFn: fetchCategories,
     staleTime: 1000 * 60 * 5, // 5 minutes
-    cacheTime: 1000 * 60 * 10, // 10 minutes
     retry: 2,
     refetchOnWindowFocus: false,
   });
 
   // Fetch products using React Query
   const {
-    data: products = [],
+    data: products = [] as Array<ProductItem>,
     isLoading: isProductsLoading,
     error: productsError,
     refetch: refetchProducts
@@ -38,7 +113,6 @@ export const CartProvider = ({ children }) => {
     queryKey: ['products', productCount],
     queryFn: () => fetchProducts(productCount),
     staleTime: 1000 * 60 * 5, // 5 minutes
-    cacheTime: 1000 * 60 * 10, // 10 minutes
     retry: 2,
     enabled: productCount > 0, // Only fetch if productCount is valid
     refetchOnWindowFocus: false,
@@ -71,7 +145,7 @@ export const CartProvider = ({ children }) => {
   }, [cartItems, isLoading]);
 
   // Add item to cart or increment quantity if already exists
-  const addToCart = useCallback((product, quantity = 1) => {
+  const addToCart = useCallback((product: ProductItem, quantity = 1) => {
     setCartItems((prevItems) => {
       const existingItem = prevItems.find((item) => item.id === product.id);
 
@@ -90,12 +164,12 @@ export const CartProvider = ({ children }) => {
   }, []);
 
   // Remove item from cart
-  const removeFromCart = useCallback((productId) => {
+  const removeFromCart = useCallback((productId: string) => {
     setCartItems((prevItems) => prevItems.filter((item) => item.id !== productId));
   }, []);
 
   // Update item quantity
-  const updateQuantity = useCallback((productId, quantity) => {
+  const updateQuantity = useCallback((productId: string, quantity: number) => {
     if (quantity <= 0) {
       removeFromCart(productId);
       return;
@@ -109,7 +183,7 @@ export const CartProvider = ({ children }) => {
   }, [removeFromCart]);
 
   // Increment item quantity
-  const incrementQuantity = useCallback((productId) => {
+  const incrementQuantity = useCallback((productId: string) => {
     setCartItems((prevItems) =>
       prevItems.map((item) =>
         item.id === productId ? { ...item, quantity: item.quantity + 1 } : item
@@ -118,7 +192,7 @@ export const CartProvider = ({ children }) => {
   }, []);
 
   // Decrement item quantity
-  const decrementQuantity = useCallback((productId) => {
+  const decrementQuantity = useCallback((productId: string) => {
     setCartItems((prevItems) =>
       prevItems.map((item) =>
         item.id === productId
@@ -135,7 +209,7 @@ export const CartProvider = ({ children }) => {
 
   // Check if item is in cart
   const isInCart = useCallback(
-    (productId) => {
+    (productId: string) => {
       return cartItems.some((item) => item.id === productId);
     },
     [cartItems]
@@ -143,7 +217,7 @@ export const CartProvider = ({ children }) => {
 
   // Get item quantity
   const getItemQuantity = useCallback(
-    (productId) => {
+    (productId: string): number => {
       const item = cartItems.find((item) => item.id === productId);
       return item ? item.quantity : 0;
     },
@@ -151,47 +225,47 @@ export const CartProvider = ({ children }) => {
   );
 
   // Calculate cart totals
-  const getCartTotal = useCallback(() => {
+  const getCartTotal = useCallback((): number => {
     return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
   }, [cartItems]);
 
-  const getCartCount = useCallback(() => {
+  const getCartCount = useCallback((): number => {
     return cartItems.reduce((count, item) => count + item.quantity, 0);
   }, [cartItems]);
 
-  const getCartItemsCount = useCallback(() => {
-    return cartItems.length;
+  const getCartItemsCount = useCallback((): number => {
+    return cartItems?.length || 0;
   }, [cartItems]);
 
   // Calculate tax (example: 10%)
-  const getTax = useCallback(() => {
+  const getTax = useCallback((): number => {
     return getCartTotal() * 0.1;
   }, [getCartTotal]);
 
   // Calculate shipping (free over $100, else $10)
-  const getShipping = useCallback(() => {
+  const getShipping = useCallback((): number => {
     const total = getCartTotal();
     return total > 100 ? 0 : 10;
   }, [getCartTotal]);
 
   // Calculate grand total
-  const getGrandTotal = useCallback(() => {
+  const getGrandTotal = useCallback((): number => {
     return getCartTotal() + getTax() + getShipping();
   }, [getCartTotal, getTax, getShipping]);
 
-  const calculateSubtotal = () => {
+  const calculateSubtotal = (): number => {
     return cartItems?.reduce((sum, item) => sum + item?.price * item?.quantity, 0);
   };
 
-  const calculateTax = () => {
+  const calculateTax = (): number => {
     return calculateSubtotal() * 0.08;
   };
 
-  const calculateShipping = () => {
+  const calculateShipping = (): number => {
     return calculateSubtotal() > 50 ? 0 : 9.99;
   };
 
-  const calculateDiscount = () => {
+  const calculateDiscount = (): number => {
     if (!appliedCoupon) return 0;
 
     const subtotal = calculateSubtotal();
@@ -202,19 +276,19 @@ export const CartProvider = ({ children }) => {
     return 0;
   };
 
-  const calculateTotal = () => {
+  const calculateTotal = (): number => {
     return calculateSubtotal() + calculateTax() + calculateShipping() - calculateDiscount();
   };
 
-  const handleUpdateQuantity = (itemId, newQuantity) => {
+  const handleUpdateQuantity = (itemId: string, newQuantity: number) => {
     setCartItems(cartItems?.map((item) => item?.id === itemId ? { ...item, quantity: Math.max(1, newQuantity) } : item));
   };
 
-  const handleRemoveItem = (itemId) => {
+  const handleRemoveItem = (itemId: string) => {
     setCartItems(cartItems?.filter((item) => item?.id !== itemId));
   };
 
-  const handleApplyCoupon = () => {
+  const handleApplyCoupon = (): void | undefined => {
     const validCoupons = ['SAVE10', 'SAVE20', 'FREESHIP'];
     if (validCoupons?.includes(couponCode?.toUpperCase())) {
       setAppliedCoupon(couponCode?.toUpperCase());

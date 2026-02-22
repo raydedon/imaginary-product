@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import Icon from '../AppIcon';
 
 class ErrorBoundary extends Component {
-  constructor(props) {
+  constructor(props: { children: React.ReactNode }) {
     super(props);
     this.state = {
       hasError: false,
@@ -12,11 +12,11 @@ class ErrorBoundary extends Component {
     };
   }
 
-  static getDerivedStateFromError(_error) {
+  static getDerivedStateFromError(_error: Error) {
     return { hasError: true };
   }
 
-  componentDidCatch(error, errorInfo) {
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     const isExpectedError = error?.message && (
       error?.message?.includes('assessment') ||
       error?.message?.includes('intentional') ||
@@ -42,47 +42,44 @@ class ErrorBoundary extends Component {
   };
 
   render() {
-    if (this.state?.hasError) {
+    if ((this.state as any).hasError) {
       return (
         <div className="min-h-screen bg-background flex items-center justify-center p-6">
           <div className="max-w-2xl w-full bg-card border border-border rounded-lg shadow-lg p-8">
             <div className="flex items-start gap-4 mb-6">
               <div className={`
                 p-3 rounded-lg
-                ${this.state?.errorType === 'expected' ?'bg-warning/20' :'bg-error/20'
+                ${((this.state as any).errorType === 'expected' ?'bg-warning/20' :'bg-error/20') as any
                 }
               `}>
                 <Icon 
-                  name={this.state?.errorType === 'expected' ? 'AlertTriangle' : 'AlertCircle'} 
+                  name={((this.state as any).errorType === 'expected' ? 'AlertTriangle' : 'AlertCircle') as any} 
                   size={24} 
-                  color={this.state?.errorType === 'expected' ?'var(--color-warning)' :'var(--color-error)'
-                  }
+                  color={((this.state as any).errorType === 'expected' ?'var(--color-warning)' :'var(--color-error)') as any}
                 />
               </div>
               <div className="flex-1">
                 <h2 className="text-h3 text-foreground mb-2">
-                  {this.state?.errorType === 'expected' ?'Assessment Error Detected' :'Unexpected Error Occurred'
-                  }
+                  {((this.state as any).errorType === 'expected' ?'Assessment Error Detected' :'Unexpected Error Occurred') as any}
                 </h2>
                 <p className="text-muted-foreground">
-                  {this.state?.errorType === 'expected' ?'This error is part of the architectural assessment. Identify the root cause and implement a solution.' :'An unexpected error occurred. This may indicate an implementation issue outside the assessment scope.'
-                  }
+                  {((this.state as any).errorType === 'expected' ?'This error is part of the architectural assessment. Identify the root cause and implement a solution.' :'An unexpected error occurred. This may indicate an implementation issue outside the assessment scope.') as any}
                 </p>
               </div>
             </div>
 
-            {this.state?.error && (
+            {((this.state as any).error) && (
               <div className="bg-muted rounded-md p-4 mb-6">
                 <div className="text-sm font-mono text-error mb-2">
-                  {this.state?.error?.toString()}
+                  {((this.state as any).error?.toString()) as any}
                 </div>
-                {this.state?.errorInfo && (
+                {((this.state as any).errorInfo) && (
                   <details className="mt-3">
                     <summary className="text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors">
                       View stack trace
                     </summary>
                     <pre className="mt-2 text-xs text-muted-foreground overflow-x-auto">
-                      {this.state?.errorInfo?.componentStack}
+                      {((this.state as any).errorInfo?.componentStack) as any}
                     </pre>
                   </details>
                 )}
@@ -100,11 +97,11 @@ class ErrorBoundary extends Component {
       );
     }
 
-    return this.props?.children;
+    return (this.props as any).children;
   }
 }
 
-const ErrorBoundaryStatusIndicator = ({ hasActiveErrors = false }) => {
+const ErrorBoundaryStatusIndicator = ({ hasActiveErrors = false }: { hasActiveErrors: boolean }) => {
   return (
     <div className="fixed top-[76px] right-[340px] z-[1050] hidden lg:block">
       <div 

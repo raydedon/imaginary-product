@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import Icon from '../AppIcon';
 
@@ -6,7 +6,7 @@ const Header = () => {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const navigationItems = [
+  const navigationItems: Array<{ label: string; path: string; icon: string; problemCount?: number }> = [
     {
       label: 'Dashboard',
       path: '/product-assessment-dashboard',
@@ -135,7 +135,7 @@ const Header = () => {
                       }
                     `}
                   >
-                    {item?.problemCount} issues
+                    {item?.problemCount ?? 0} issues
                   </span>
                 )}
               </Link>

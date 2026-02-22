@@ -1,10 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Image from '../../../components/AppImage';
 import Icon from '../../../components/AppIcon';
 
-const ProductImageGallery = ({ images, productName: _productName }) => {
+interface ProductImageGalleryProps {
+  images: Array<{ url: string; alt: string }>;
+}
+
+const ProductImageGallery = ({ images }: ProductImageGalleryProps) => {
   const [selectedImage, setSelectedImage] = useState(0);
-  const [_imageLoadStates, _setImageLoadStates] = useState({});
+  const [imageLoadStates, setImageLoadStates] = useState({});
 
   useEffect(() => {
     setTimeout(() => {
@@ -12,17 +16,17 @@ const ProductImageGallery = ({ images, productName: _productName }) => {
     }, 3000);
   }, [selectedImage]);
 
-  const handleImageLoad = (index) => {
+  const handleImageLoad = useCallback((index: number) => {
     setImageLoadStates(prev => ({ ...prev, [index]: true }));
-  };
+  }, []);
 
-  const nextImage = () => {
+  const nextImage = useCallback(() => {
     setSelectedImage((prev) => (prev + 1) % images?.length);
-  };
+  }, [images]);
 
-  const prevImage = () => {
+  const prevImage = useCallback(() => {
     setSelectedImage((prev) => (prev - 1 + images?.length) % images?.length);
-  };
+  }, [images]);
 
   return (
     <div className="w-full">

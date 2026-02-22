@@ -1,6 +1,6 @@
 {
   "name": "@raydedon/assessment-lib",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A utility library with datetime, phone, and data transformer utilities",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
